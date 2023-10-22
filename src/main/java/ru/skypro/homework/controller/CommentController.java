@@ -19,8 +19,7 @@ import ru.skypro.homework.dto.comment.CreateOrUpdateComment;
 import ru.skypro.homework.service.CommentService;
 
 import java.util.Collections;
-@Slf4j
-//@CrossOrigin(value = "http://localhost:3000")
+@CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequestMapping("/ads")
 @Tag(name = "Комментарии")

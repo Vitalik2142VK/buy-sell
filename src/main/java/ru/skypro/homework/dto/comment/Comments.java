@@ -9,8 +9,6 @@ import ru.skypro.homework.dto.comment.Comment;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@Schema(name = "Comments")
 public class Comments {
 
     @Schema(description = "общее количество комментариев")
