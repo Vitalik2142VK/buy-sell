@@ -13,9 +13,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.skypro.homework.dto.Comment;
-import ru.skypro.homework.dto.Comments;
-import ru.skypro.homework.dto.CreateOrUpdateComment;
+import ru.skypro.homework.dto.comment.Comment;
+import ru.skypro.homework.dto.comment.Comments;
+import ru.skypro.homework.dto.comment.CreateOrUpdateComment;
+import ru.skypro.homework.service.CommentService;
 
 import java.util.Collections;
 @Slf4j
@@ -24,6 +25,12 @@ import java.util.Collections;
 @RequestMapping("/ads")
 @Tag(name = "Комментарии")
 public class CommentController {
+
+    private final CommentService commentService;
+
+    public CommentController(CommentService commentService) {
+        this.commentService = commentService;
+    }
 
     @Operation(summary = "Получение всех комментариев объявления")
     @ApiResponses(value = {
@@ -41,7 +48,7 @@ public class CommentController {
     @GetMapping("/{id}/comments")
     public ResponseEntity<Comments> findAllAdComments(@PathVariable
                                                           @Parameter(description = "id объявления") Integer id) {
-        return ResponseEntity.ok(new Comments(0, Collections.emptyList()));
+        return ResponseEntity.ok(commentService.findAllAdComments(id));
     }
 
     @Operation(summary = "Добавление комментария к объявлению")
@@ -62,7 +69,7 @@ public class CommentController {
                                                      @Parameter(description = "id объявления") Integer id,
                                                  @RequestBody
                                                      @Validated CreateOrUpdateComment createOrUpdateComment) {
-        return ResponseEntity.ok(new Comment(0, "", "", 0, 0, ""));
+        return ResponseEntity.ok(commentService.createComment(id, createOrUpdateComment));
     }
 
     @Operation(summary = "Удаление комментария")
@@ -85,7 +92,8 @@ public class CommentController {
                                                  @Parameter(description = "id объявления") Integer adId,
                                              @PathVariable
                                                  @Parameter(description = "id комментария") Integer commentId) {
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+//        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.ok(commentService.deleteAdComment(adId, commentId));
     }
 
     @Operation(summary = "Обновление комментария")
@@ -111,7 +119,7 @@ public class CommentController {
                                                      @Parameter(description = "id комментария") Integer commentId,
                                                     @RequestBody
                                                      @Validated CreateOrUpdateComment createOrUpdateComment) {
-        return ResponseEntity.ok(new Comment(0, "", "", 0, 0, ""));
+        return ResponseEntity.ok(commentService.updateComment(adId, commentId, createOrUpdateComment));
     }
 
 }
