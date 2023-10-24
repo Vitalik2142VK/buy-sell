@@ -1,5 +1,6 @@
 package ru.skypro.homework.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,8 +13,10 @@ import ru.skypro.homework.service.AnnounceService;
 
 import java.util.List;
 
+@CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequestMapping("/ads")
+@Tag(name = "Объявления")
 public class AnnounceController {
     private final AnnounceService announceService;
 
