@@ -9,8 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Property {
+public class CreateOrUpdateAd {
     private String title;
-    private Long price;
+    private int price;
     private String description;
 }

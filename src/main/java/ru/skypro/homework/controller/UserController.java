@@ -2,15 +2,13 @@ package ru.skypro.homework.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import net.bytebuddy.build.Plugin;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.user.NewPasswordUser;
-import ru.skypro.homework.dto.user.UserChangeDtoIn;
-import ru.skypro.homework.dto.user.UserDto;
+import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.service.UserService;
 
 @CrossOrigin(value = "http://localhost:3000")
@@ -51,7 +49,7 @@ public class UserController {
 
     @PatchMapping("/me")
     @Operation(summary = "Обновление информации об авторизованном пользователе")
-    public ResponseEntity<?> putUser(@RequestBody UserChangeDtoIn userChange) {
+    public ResponseEntity<?> putUser(@RequestBody UserChangeDto userChange) {
         if (userService.userLogged()) {
             return ResponseEntity.ok(userService.putUser(userChange));
         } else {

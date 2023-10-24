@@ -3,7 +3,7 @@ package ru.skypro.homework.dto.user;
 import lombok.Data;
 
 @Data
-public class UserChangeDtoOut {
+public class UserChangeDto {
 
     private String firstName;
     private String lastName;

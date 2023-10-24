@@ -12,9 +12,9 @@ import java.util.List;
 public class Comments {
 
     @Schema(description = "общее количество комментариев")
-    Integer count;
+    private Integer count;
 
     @Schema(description = "список всех комментариев")
-    List<Comment> results;
+    private List<Comment> results;
 
 }

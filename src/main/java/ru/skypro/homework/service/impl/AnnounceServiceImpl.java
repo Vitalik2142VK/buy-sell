@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.announce.Announce;
 import ru.skypro.homework.dto.announce.AnnounceOut;
-import ru.skypro.homework.dto.announce.Property;
+import ru.skypro.homework.dto.announce.CreateOrUpdateAd;
 import ru.skypro.homework.service.AnnounceService;
 
 import java.util.List;
@@ -27,12 +27,12 @@ public class AnnounceServiceImpl implements AnnounceService {
     }
 
     @Override
-    public AnnounceOut add(Property properties, MultipartFile image) {
+    public AnnounceOut add(CreateOrUpdateAd properties, MultipartFile image) {
         return null;
     }
 
     @Override
-    public AnnounceOut updateInfo(Long id, Property property) {
+    public AnnounceOut updateInfo(Long id, CreateOrUpdateAd property) {
         return null;
     }
 

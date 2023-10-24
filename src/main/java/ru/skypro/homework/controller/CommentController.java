@@ -18,6 +18,7 @@ import ru.skypro.homework.dto.comment.Comments;
 import ru.skypro.homework.dto.comment.CreateOrUpdateComment;
 import ru.skypro.homework.service.CommentService;
 
+import javax.validation.Valid;
 import java.util.Collections;
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
@@ -67,7 +68,7 @@ public class CommentController {
     public ResponseEntity<Comment> createComment(@PathVariable
                                                      @Parameter(description = "id объявления") Integer id,
                                                  @RequestBody
-                                                     @Validated CreateOrUpdateComment createOrUpdateComment) {
+                                                     @Valid CreateOrUpdateComment createOrUpdateComment) {
         return ResponseEntity.ok(commentService.createComment(id, createOrUpdateComment));
     }
 
@@ -117,7 +118,7 @@ public class CommentController {
                                                     @PathVariable
                                                      @Parameter(description = "id комментария") Integer commentId,
                                                     @RequestBody
-                                                     @Validated CreateOrUpdateComment createOrUpdateComment) {
+                                                     @Valid CreateOrUpdateComment createOrUpdateComment) {
         return ResponseEntity.ok(commentService.updateComment(adId, commentId, createOrUpdateComment));
     }
 

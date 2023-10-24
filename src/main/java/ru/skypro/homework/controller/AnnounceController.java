@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.announce.AnnounceOut;
-import ru.skypro.homework.dto.announce.Property;
+import ru.skypro.homework.dto.announce.CreateOrUpdateAd;
 import ru.skypro.homework.service.AnnounceService;
 
 import java.util.List;
@@ -29,25 +29,25 @@ public class AnnounceController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> add(@RequestParam Property properties,
+    public ResponseEntity<?> add(@RequestParam CreateOrUpdateAd properties,
                                  @RequestPart MultipartFile image) {
         return ResponseEntity.status(HttpStatus.CREATED).body(announceService.add(properties, image));
     }
 
-    @GetMapping("{id]")
+    @GetMapping("{id}")
     public ResponseEntity<?> get(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(announceService.get(id));
     }
 
-    @DeleteMapping("{id]")
+    @DeleteMapping("{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         announceService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PatchMapping("{id]")
+    @PatchMapping("{id}")
     public ResponseEntity<?> updateInfo(@PathVariable Long id,
-                                    @RequestParam Property property) {
+                                    @RequestParam CreateOrUpdateAd property) {
         return ResponseEntity.status(HttpStatus.OK).body(announceService.updateInfo(id, property));
     }
 
@@ -58,7 +58,7 @@ public class AnnounceController {
         return ResponseEntity.status(HttpStatus.OK).body(Pair.of(count, results));
     }
 
-    @PatchMapping(value = "{id]/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateImage(@PathVariable Long id,
                                          @RequestPart MultipartFile image) {
         announceService.updateImage(id, image);
