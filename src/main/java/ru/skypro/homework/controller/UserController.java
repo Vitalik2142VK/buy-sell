@@ -1,12 +1,17 @@
 package ru.skypro.homework.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.dto.comment.Comments;
 import ru.skypro.homework.dto.user.NewPasswordUser;
 import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.service.UserService;
@@ -23,8 +28,19 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/set_password")
     @Operation(summary = "Обновление пароля")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = {@Content(schema = @Schema(hidden = true))
+                    }),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = {@Content(schema = @Schema(hidden = true))
+                    }),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = {@Content(schema = @Schema(hidden = true))
+                    })
+    })
+    @PostMapping("/set_password")
     public ResponseEntity<?> setPassword(@RequestBody NewPasswordUser newPassword) {
         if (userService.userLogged()) {
             if (userService.changePassword(newPassword)) {
@@ -37,8 +53,17 @@ public class UserController {
         }
     }
 
-    @GetMapping("/me")
     @Operation(summary = "Получение информации об авторизованном пользователе")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = Comments.class))
+                    }),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = {@Content(schema = @Schema(hidden = true))
+                    })
+    })
+    @GetMapping("/me")
     public ResponseEntity<?> getUser() {
         if (userService.userLogged()) {
             return ResponseEntity.ok(userService.getUserDto());
@@ -47,8 +72,17 @@ public class UserController {
         }
     }
 
-    @PatchMapping("/me")
     @Operation(summary = "Обновление информации об авторизованном пользователе")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = Comments.class))
+                    }),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = {@Content(schema = @Schema(hidden = true))
+                    })
+    })
+    @PatchMapping("/me")
     public ResponseEntity<?> putUser(@RequestBody UserChangeDto userChange) {
         if (userService.userLogged()) {
             return ResponseEntity.ok(userService.putUser(userChange));
@@ -57,8 +91,16 @@ public class UserController {
         }
     }
 
-    @PatchMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Обновление аватара авторизованного пользователя")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = {@Content(schema = @Schema(hidden = true))
+                    }),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = {@Content(schema = @Schema(hidden = true))
+                    })
+    })
+    @PatchMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> putUserImage(@RequestParam MultipartFile image) {
         if (userService.userLogged()) {
             userService.putUserImage(image);
