@@ -7,10 +7,13 @@ import ru.skypro.homework.converter.CommentToCommentDtoConverter;
 import ru.skypro.homework.dto.comment.CommentDto;
 import ru.skypro.homework.dto.comment.CommentsDto;
 import ru.skypro.homework.dto.comment.CreateOrUpdateCommentDto;
+import ru.skypro.homework.entity.AnnounceEntity;
 import ru.skypro.homework.entity.Comment;
+import ru.skypro.homework.entity.User;
 import ru.skypro.homework.mapper.CommentMapper;
-import ru.skypro.homework.repository.AuthRepository;
+import ru.skypro.homework.repository.AnnounceRepository;
 import ru.skypro.homework.repository.CommentRepository;
+import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.CommentService;
 
 import java.util.List;
@@ -21,17 +24,17 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final AnnounceRepository announceRepository;
-    private final AuthRepository authRepository;
+    private final UserRepository userRepository;
     private final CommentMapper commentMapper;
     private final CommentToCommentDtoConverter toCommentDtoConverter;
 
     @Override
-    public CommentsDto findAllAdComments(Integer id) {
-        if (id == null) {
+    public CommentsDto findAllAdComments(Integer adId) {
+        if (adId == null) {
             //TODO: исправить на согласованный вариант возврата пустого списка
             return null;
         }
-        List<Comment> listComments = commentRepository.findAllByAd_IdOrderByCreatedAtDesc(id);
+        List<Comment> listComments = commentRepository.findAllByAd_IdOrderByCreatedAtDesc(adId);
 
         return CommentsDto.builder()
                 .results(toCommentDtoConverter.convertAll(listComments))
@@ -42,7 +45,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDto createComment(Integer id, CreateOrUpdateCommentDto createOrUpdateComment, Authentication authentication) {
         AnnounceEntity announce = announceRepository.findById(id).orElseThrow();
-        User currentUSer = authRepository.findFirstByName(authentication.getName()).orElseThrow();
+        User currentUSer = userRepository.findFirstByName(authentication.getName()).orElseThrow();
         Comment comment = commentMapper.mapToNewComment(createOrUpdateComment);
         comment.setAd(announce);
         comment.setAuthor(currentUSer);
@@ -52,14 +55,42 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public boolean deleteAdComment(Integer adId, Integer commentId, Authentication authentication) {
-        return false;
+        if (adId == null || commentId == null) {
+            throw new IllegalArgumentException("adId or commentId variables must not be null!");
+        }
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        User currentUSer = userRepository.findFirstByName(authentication.getName()).orElseThrow();
+        AnnounceEntity announce = announceRepository.findById(adId).orElseThrow();
+
+        if (!comment.getAd().equals(announce)) {
+            throw new IllegalArgumentException("not found");
+        }
+        if (!comment.getAuthor().equals(currentUSer)) {
+            throw new IllegalArgumentException("not permit");
+        }
+        commentRepository.delete(comment);
+        return true;
+
     }
 
     @Override
     public CommentDto updateComment(Integer adId, Integer commentId, CreateOrUpdateCommentDto createOrUpdateCommentDto, Authentication authentication) {
-        AnnounceEntity announce = announceRepository.findById(id).orElseThrow();
-        User currentUSer = authRepository.findFirstByName(authentication.getName()).orElseThrow();
+        if (commentId == null) {
+            return null;
+        }
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        User currentUSer = userRepository.findFirstByName(authentication.getName()).orElseThrow();
+        AnnounceEntity announce = announceRepository.findById(adId).orElseThrow();
 
-        return null;
+        if (!comment.getAd().equals(announce)) {
+            throw new IllegalArgumentException("not found");
+        } else if (!comment.getAuthor().equals(currentUSer)) {
+            throw new IllegalArgumentException("not permit");
+        }
+        comment.setText(createOrUpdateCommentDto.getText());
+        commentRepository.save(comment);
+        return toCommentDtoConverter.convert(comment);
     }
+
+
 }

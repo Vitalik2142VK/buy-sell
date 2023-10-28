@@ -3,9 +3,9 @@ package ru.skypro.homework.converter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class AbstractConverter<IN, OUT> implements Converter<IN, OUT> {
+public abstract class AbstractConverter<IN, OUT>   implements Converter<IN, OUT> {
 
-    public abstract OUT apply(IN in);
+    protected abstract OUT apply(IN in);
 
     @Override
     public OUT convert(IN in) {
@@ -22,4 +22,6 @@ public abstract class AbstractConverter<IN, OUT> implements Converter<IN, OUT> {
         }
         return list.stream().map(item -> apply(item)).collect(Collectors.toList());
     }
+
+
 }

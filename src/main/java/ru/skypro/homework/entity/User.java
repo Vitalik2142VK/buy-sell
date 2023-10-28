@@ -1,5 +1,6 @@
 package ru.skypro.homework.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import ru.skypro.homework.dto.Role;
@@ -11,6 +12,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Table(name = "users")
+@EqualsAndHashCode(of = "id")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
