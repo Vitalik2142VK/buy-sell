@@ -1,7 +1,9 @@
 package ru.skypro.homework.dto.comment;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
+@Data
 public class CreateOrUpdateCommentDto {
 
     @Schema(description = "текст комментария", minimum = "8", maximum = "64", example = "текст комментария")

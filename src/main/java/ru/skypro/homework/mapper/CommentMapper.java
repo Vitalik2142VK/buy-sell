@@ -1,36 +1,27 @@
 package ru.skypro.homework.mapper;
 
 import org.springframework.stereotype.Component;
+import ru.skypro.homework.dto.announce.Announce;
 import ru.skypro.homework.dto.comment.CommentDto;
-import ru.skypro.homework.entity.CommentEntity;
+import ru.skypro.homework.dto.comment.CreateOrUpdateCommentDto;
+import ru.skypro.homework.entity.Comment;
+
+import java.time.Instant;
 
 @Component
 public class CommentMapper {
-    private final UserRepository userRepository;
-    private final AnnounceRepository announceRepository;
 
-    public CommentMapper(UserRepository userRepository,
-                         AnnounceRepository announceRepository) {
-        this.userRepository = userRepository;
-        this.announceRepository = announceRepository;
+    public CommentMapper() {
     }
 
-    public CommentDto mapToCommentDto(CommentEntity commentEntity) {
-        CommentDto dto = new CommentDto();
-        dto.setAuthor(commentEntity.getAuthor().getId());
-        dto.setAuthorImage(commentEntity.getAuthor().getImage());
-        dto.setAuthorFirstName(commentEntity.getAuthor().getFirstName());
-        dto.setCreatedAt((int) commentEntity.getCreatedAt());
-        dto.setPk(commentEntity.getId());
-        dto.setText(commentEntity.getText());
-        return dto;
+    public CommentDto mapToCommentDto(Comment comment) {
+        return new CommentDto(comment);
     }
 
-    public CommentEntity mapToCommentEntity(CommentDto commentDto) {
-        CommentEntity commentEntity = new CommentEntity();
-        commentEntity.setAuthor(commentDto.getAuthor().getFirstName);
-        commentEntity.setText(commentDto.getText());
-        commentEntity.setCreatedAt(commentDto.getCreatedAt());
+    public Comment mapToNewComment(CreateOrUpdateCommentDto commentDto) {
+        Comment comment = new Comment();
+        comment.setText(commentDto.getText());
+        comment.setCreatedAt(Instant.now().getEpochSecond());
+        return comment;
     }
-
 }
