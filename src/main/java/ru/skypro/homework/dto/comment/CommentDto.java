@@ -9,7 +9,7 @@ import ru.skypro.homework.entity.Comment;
 public class CommentDto {
 
     @Schema(description = "id автора объявления")
-    private long author;
+    private int author;
 
     @Schema(description = "ссылка на аватар автора комментария")
     private String authorImage;

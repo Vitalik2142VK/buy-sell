@@ -3,6 +3,7 @@ package ru.skypro.homework.mapping;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.skypro.homework.dto.comment.CommentDto;
+import ru.skypro.homework.dto.comment.CommentsDto;
 import ru.skypro.homework.dto.comment.CreateOrUpdateCommentDto;
 import ru.skypro.homework.entity.Comment;
 import java.time.Instant;
@@ -25,11 +26,15 @@ public class CommentMapper {
         return comment;
     }
 
-    public List CommentListToCommentDtoList(List<Comment> comments) {
+    public CommentsDto CommentListToCommentDtoList(List<Comment> comments) {
+        CommentsDto dto = new CommentsDto();
+        dto.setCount(comments.size());
         List<CommentDto> commentDtoList = comments
                 .stream()
                 .map(this :: mapToCommentDto).collect(Collectors.toList());
-        return commentDtoList;
+        dto.setResults(commentDtoList);
+        return dto;
     }
+
 
 }
