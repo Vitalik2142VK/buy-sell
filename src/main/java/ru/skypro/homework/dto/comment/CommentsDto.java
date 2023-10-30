@@ -11,7 +11,7 @@ import java.util.List;
 public class CommentsDto {
 
     @Schema(description = "общее количество комментариев")
-    private Integer count;
+    private int count;
 
     @Schema(description = "список всех комментариев")
     private List<CommentDto> results;
