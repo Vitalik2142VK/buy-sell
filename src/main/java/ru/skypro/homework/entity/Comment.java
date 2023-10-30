@@ -13,11 +13,11 @@ import java.util.Objects;
 @Getter
 @Setter
 @Table(name = "comments")
-@EqualsAndHashCode(of = "id")
 public class Comment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private int id;
 
     @ManyToOne
     @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "fk_comments_users"))
