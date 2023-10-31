@@ -12,12 +12,12 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
-@Table(name = "comments")
+@Table(name = "comments_table")
 public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "fk_comments_users"))
@@ -25,12 +25,10 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "ad_id", foreignKey = @ForeignKey(name = "fk_comments_ads"))
-    private AnnounceEntity ad;
+    private Announce ad;
 
-    @Column(name = "created_at")
     private long createdAt;
-
-    @Column(name = "text")
+    @Column(name = "text_comment")
     private String text;
 
     @Override
@@ -45,5 +43,4 @@ public class Comment {
     public int hashCode() {
         return Objects.hash(id);
     }
-
 }

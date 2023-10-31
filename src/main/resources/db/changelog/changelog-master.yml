@@ -2,6 +2,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/scripts/users.sql
   - include:
-      file: db/changelog/scripts/announces.sql #файл для редактирования БД Объявлений
-#  - include:
-#      file: db/changelog/scripts/___.sql #файл для редактирования БД Комментариев
+      file: db/changelog/scripts/announces.sql
+  - include:
+      file: db/changelog/scripts/comments.sql

@@ -41,7 +41,7 @@ public class AnnounceServiceImpl implements AnnounceService {
     }
 
     @Override
-    public Announce get(Long id) {
+    public Announce get(Integer id) {
         return announceRepository.findById(id)
                 //TODO Заменить на логер
                 .orElseThrow(RuntimeException::new);
@@ -64,7 +64,7 @@ public class AnnounceServiceImpl implements AnnounceService {
     }
 
     @Override
-    public AnnounceDtoOut updateInfo(Long id, CreateOrUpdateAd property) {
+    public AnnounceDtoOut updateInfo(Integer id, CreateOrUpdateAd property) {
         //TODO Заменить на логер
         Announce announce = announceRepository.findById(id)
                 .orElseThrow(RuntimeException::new);
@@ -75,7 +75,7 @@ public class AnnounceServiceImpl implements AnnounceService {
     }
 
     @Override
-    public void updateImage(Long id, MultipartFile image) throws IOException {
+    public void updateImage(Integer id, MultipartFile image) throws IOException {
         Announce announce = announceRepository.findById(id)
                 //TODO Заменить на логер
                 .orElseThrow(RuntimeException::new);
@@ -83,7 +83,7 @@ public class AnnounceServiceImpl implements AnnounceService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         announceRepository.delete(
                 //TODO Заменить на логер
                 announceRepository.findById(id).orElseThrow(RuntimeException::new)

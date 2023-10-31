@@ -11,9 +11,9 @@ import java.util.List;
 public interface AnnounceService {
     List<AnnounceDtoOut> getUsersAll();
     List<AnnounceDtoOut> getAll();
-    Announce get(Long id);
+    Announce get(Integer id);
     AnnounceDtoOut add(CreateOrUpdateAd properties, MultipartFile image) throws IOException;
-    AnnounceDtoOut updateInfo(Long id, CreateOrUpdateAd property);
-    void updateImage(Long id, MultipartFile image) throws IOException;
-    void delete(Long id);
+    AnnounceDtoOut updateInfo(Integer id, CreateOrUpdateAd property);
+    void updateImage(Integer id, MultipartFile image) throws IOException;
+    void delete(Integer id);
 }

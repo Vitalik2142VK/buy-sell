@@ -12,12 +12,11 @@ import java.util.Objects;
 @Getter
 @Setter
 @Table(name = "users")
-@EqualsAndHashCode(of = "id")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
-    private int id;
+    private Integer id;
     private String email;
     private String firstName;
     private String lastName;
@@ -27,11 +26,11 @@ public class User {
     private String image;
 
     @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        User user = (User) object;
-        return id == user.id;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
     }
 
     @Override
