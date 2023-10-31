@@ -11,6 +11,6 @@ CREATE TABLE announces(
     image VARCHAR(32) NOT NULL CONSTRAINT image_not_null,
     phone VARCHAR(32),
     price BIGINT,
-    title VARCHAR(32),
+    title VARCHAR(32)
 );
 
