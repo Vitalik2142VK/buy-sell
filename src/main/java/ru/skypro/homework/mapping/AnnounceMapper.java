@@ -1,4 +1,4 @@
-package ru.skypro.homework.mapper;
+package ru.skypro.homework.mapping;
 
 import org.springframework.stereotype.Component;
 import ru.skypro.homework.entity.Announce;
@@ -19,14 +19,14 @@ public class AnnounceMapper {
 
     public Announce toEntity(AnnounceDtoIn announceDtoIn) {
         Announce announce = new Announce();
-        announce.setPk((long) announceDtoIn.getPk());
+        announce.setPk(announceDtoIn.getPk());
         announce.setAuthorFirstName(announceDtoIn.getAuthorFirstName());
         announce.setAuthorLastName(announceDtoIn.getAuthorLastName());
         announce.setDescription(announceDtoIn.getDescription());
         announce.setEmail(announceDtoIn.getEmail());
         announce.setImage(announceDtoIn.getImage());
         announce.setPhone(announceDtoIn.getPhone());
-        announce.setPrice((long) announceDtoIn.getPrice());
+        announce.setPrice(announceDtoIn.getPrice());
         announce.setTitle(announceDtoIn.getTitle());
         return announce;
     }

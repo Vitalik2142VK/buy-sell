@@ -2,7 +2,7 @@
 
 -- changeset morozov-1: created_table_announces
 CREATE TABLE announces(
-    id SERIAL PRIMARY KEY NOT NULL CONSTRAINT id_not_null,
+    id BIGSERIAL PRIMARY KEY NOT NULL CONSTRAINT id_not_null,
     pk BIGINT NOT NULL CONSTRAINT pk_not_null,
     author_first_name VARCHAR(32),
     author_last_name VARCHAR(32),

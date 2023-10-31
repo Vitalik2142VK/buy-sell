@@ -6,7 +6,7 @@ import ru.skypro.homework.dto.announce.CreateOrUpdateAd;
 import ru.skypro.homework.entity.Announce;
 import ru.skypro.homework.dto.announce.AnnounceDtoIn;
 import ru.skypro.homework.dto.announce.AnnounceDtoOut;
-import ru.skypro.homework.mapper.AnnounceMapper;
+import ru.skypro.homework.mapping.AnnounceMapper;
 import ru.skypro.homework.repository.AnnounceRepository;
 import ru.skypro.homework.service.AnnounceService;
 
@@ -70,7 +70,7 @@ public class AnnounceServiceImpl implements AnnounceService {
                 .orElseThrow(RuntimeException::new);
         announce.setDescription(property.getDescription());
         announce.setTitle(announce.getTitle());
-        announce.setPrice((long) property.getPrice());
+        announce.setPrice(property.getPrice());
         return announceMapper.toDTO(announceRepository.save(announce));
     }
 
