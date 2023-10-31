@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnnounceOut {
+public class AnnounceDtoOut {
     private int author;
     private String image;
     private int pk;

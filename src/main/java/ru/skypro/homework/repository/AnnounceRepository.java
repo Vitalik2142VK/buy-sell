@@ -1,7 +1,10 @@
 package ru.skypro.homework.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.skypro.homework.entity.AnnounceEntity;
+import ru.skypro.homework.entity.Announce;
 
-public interface AnnounceRepository extends JpaRepository<AnnounceEntity, Integer> {
+import java.util.List;
+
+public interface AnnounceRepository extends JpaRepository<Announce, Long> {
+    List<Announce> findAllByPk(Long pk);
 }
