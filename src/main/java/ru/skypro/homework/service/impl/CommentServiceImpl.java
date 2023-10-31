@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.comment.CommentDto;
 import ru.skypro.homework.dto.comment.CommentsDto;
 import ru.skypro.homework.dto.comment.CreateOrUpdateCommentDto;
-import ru.skypro.homework.entity.AnnounceEntity;
+import ru.skypro.homework.entity.Announce;
 import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.mapping.CommentMapper;
@@ -46,7 +46,7 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto createComment(Integer id, CreateOrUpdateCommentDto createOrUpdateComment,
                                     Authentication authentication) {
 
-        AnnounceEntity announce = announceRepository.findById(id).orElseThrow();
+        Announce announce = announceRepository.findById(Long.valueOf(id)).orElseThrow();
         User currentUSer = userRepository.findFirstByName(authentication.getName()).orElseThrow();
         Comment comment = commentMapper.mapToNewComment(createOrUpdateComment);
         comment.setAd(announce);
@@ -64,7 +64,7 @@ public class CommentServiceImpl implements CommentService {
         }
         Comment comment = commentRepository.findById(commentId).orElseThrow();
         User currentUSer = userRepository.findFirstByName(authentication.getName()).orElseThrow();
-        AnnounceEntity announce = announceRepository.findById(adId).orElseThrow();
+        Announce announce = announceRepository.findById(Long.valueOf(adId)).orElseThrow();
 
         if (!comment.getAd().equals(announce)) {
             throw new IllegalArgumentException("not found");
@@ -86,7 +86,7 @@ public class CommentServiceImpl implements CommentService {
         }
         Comment comment = commentRepository.findById(commentId).orElseThrow();
         User currentUSer = userRepository.findFirstByName(authentication.getName()).orElseThrow();
-        AnnounceEntity announce = announceRepository.findById(adId).orElseThrow();
+        Announce announce = announceRepository.findById(Long.valueOf(adId)).orElseThrow();
         if (!comment.getAd().equals(announce)) {
             throw new IllegalArgumentException("not found");
         } else if (!comment.getAuthor().equals(currentUSer)) {

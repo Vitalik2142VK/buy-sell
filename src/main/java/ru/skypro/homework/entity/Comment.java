@@ -25,7 +25,7 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "ad_id", foreignKey = @ForeignKey(name = "fk_comments_ads"))
-    private AnnounceEntity ad;
+    private Announce ad;
 
     @Column(name = "created_at")
     private long createdAt;
