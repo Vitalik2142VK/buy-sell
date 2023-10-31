@@ -9,9 +9,14 @@ public interface CommentService {
 
     CommentsDto findAllAdComments(Integer adId);
 
-    CommentDto createComment(Integer id, CreateOrUpdateCommentDto createOrUpdateCommentDto, Authentication authentication);
+    CommentDto createComment(Integer id,
+                             CreateOrUpdateCommentDto createOrUpdateCommentDto,
+                             Authentication authentication);
 
-    boolean deleteAdComment(Integer adId, Integer commentId, Authentication authentication);
+    boolean deleteAdComment(Integer adId, Integer commentId,
+                            Authentication authentication);
 
-    CommentDto updateComment(Integer adId, Integer commentId, CreateOrUpdateCommentDto createOrUpdateCommentDto, Authentication authentication);
+    CommentDto updateComment(Integer adId, Integer commentId,
+                             CreateOrUpdateCommentDto createOrUpdateCommentDto,
+                             Authentication authentication);
 }

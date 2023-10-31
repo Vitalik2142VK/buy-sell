@@ -95,7 +95,6 @@ public class CommentController {
                                              @PathVariable
                                              @Parameter(description = "id комментария") Integer commentId,
                                              @AuthenticationPrincipal Authentication authentication) {
-//        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         return ResponseEntity.ok(commentService.deleteAdComment(adId, commentId, authentication));
     }
 
