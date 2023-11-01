@@ -63,7 +63,7 @@ public class CommentServiceImpl implements CommentService {
             throw new IllegalArgumentException("adId or commentId variables must not be null!");
         }
         Comment comment = commentRepository.findById(commentId).orElseThrow();
-        User currentUSer = userRepository.findFirstByName(authentication.getName()).orElseThrow();
+        User currentUSer = userRepository.findFirstByFirstName(authentication.getName()).orElseThrow();
         Announce announce = announceRepository.findById(adId).orElseThrow();
 
         if (!comment.getAd().equals(announce)) {
@@ -85,7 +85,7 @@ public class CommentServiceImpl implements CommentService {
             return null;
         }
         Comment comment = commentRepository.findById(commentId).orElseThrow();
-        User currentUSer = userRepository.findFirstByName(authentication.getName()).orElseThrow();
+        User currentUSer = userRepository.findFirstByFirstName(authentication.getName()).orElseThrow();
         Announce announce = announceRepository.findById(adId).orElseThrow();
         if (!comment.getAd().equals(announce)) {
             throw new IllegalArgumentException("not found");
