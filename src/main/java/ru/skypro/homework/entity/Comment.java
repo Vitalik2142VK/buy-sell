@@ -12,7 +12,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
-@Table(name = "comments_table")
+@Table(name = "comments")
 public class Comment {
 
     @Id

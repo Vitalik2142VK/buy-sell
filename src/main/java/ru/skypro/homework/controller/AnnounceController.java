@@ -61,7 +61,8 @@ public class AnnounceController {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(announceService.add(properties, image));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            //TODO добавить лог
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
@@ -122,7 +123,7 @@ public class AnnounceController {
     })
     @PatchMapping("{id}")
     public ResponseEntity<?> updateInfo(@PathVariable Integer id,
-                                        @RequestParam CreateOrUpdateAd property) {
+                                        @RequestBody CreateOrUpdateAd property) {
         return ResponseEntity.status(HttpStatus.OK).body(announceService.updateInfo(id, property));
     }
 
@@ -166,7 +167,8 @@ public class AnnounceController {
             announceService.updateImage(id, image);
             return ResponseEntity.status(HttpStatus.OK).body("string");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            //TODO добавить лог
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 }

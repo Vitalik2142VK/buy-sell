@@ -1,7 +1,7 @@
 -- liquibase formatted sql
 
 -- changeset chikin:Created_table_comment
-CREATE TABLE comments_table(
+CREATE TABLE comments(
     id SERIAL NOT NULL,
     text_comment CHARACTER VARYING(64) NOT NULL CONSTRAINT max_min_comment_length
         CHECK (char_length(text_comment) >= 8 and char_length(text_comment) <= 64),

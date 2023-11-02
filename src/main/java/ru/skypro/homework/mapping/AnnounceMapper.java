@@ -1,33 +1,45 @@
 package ru.skypro.homework.mapping;
 
 import org.springframework.stereotype.Component;
+import ru.skypro.homework.dto.announce.CreateOrUpdateAd;
 import ru.skypro.homework.entity.Announce;
-import ru.skypro.homework.dto.announce.AnnounceDtoIn;
+import ru.skypro.homework.dto.announce.AnnounceDto;
 import ru.skypro.homework.dto.announce.AnnounceDtoOut;
+import ru.skypro.homework.entity.User;
 
 @Component
 public class AnnounceMapper {
     public AnnounceDtoOut toDTO(Announce announce) {
         AnnounceDtoOut announceDtoOut = new AnnounceDtoOut();
-        announceDtoOut.setAuthor(announceDtoOut.getAuthor());
+        announceDtoOut.setAuthor(announce.getAuthor().getId());
         announceDtoOut.setImage(announce.getImage());
-        announceDtoOut.setPk(Math.toIntExact(announce.getPk()));
-        announceDtoOut.setPrice(Math.toIntExact(announce.getPrice()));
+        announceDtoOut.setPk(announce.getId());
+        announceDtoOut.setPrice(announce.getPrice());
         announceDtoOut.setTitle(announce.getTitle());
         return announceDtoOut;
     }
 
-    public Announce toEntity(AnnounceDtoIn announceDtoIn) {
+    public AnnounceDto mapToAnnounceDto(Announce announce) {
+        AnnounceDto dto = new AnnounceDto();
+        dto.setPk(announce.getId());
+        dto.setAuthorFirstName(announce.getAuthor().getFirstName());
+        dto.setAuthorLastName(announce.getAuthor().getLastName());
+        dto.setDescription(announce.getDescription());
+        dto.setEmail(announce.getAuthor().getEmail());
+        dto.setImage(announce.getImage());
+        dto.setPhone(announce.getAuthor().getPhone());
+        dto.setPrice(announce.getPrice());
+        dto.setTitle(announce.getTitle());
+        return dto;
+    }
+
+    public Announce createdAd(CreateOrUpdateAd dto, String image, User author) {
         Announce announce = new Announce();
-        announce.setPk(announceDtoIn.getPk());
-        announce.setAuthorFirstName(announceDtoIn.getAuthorFirstName());
-        announce.setAuthorLastName(announceDtoIn.getAuthorLastName());
-        announce.setDescription(announceDtoIn.getDescription());
-        announce.setEmail(announceDtoIn.getEmail());
-        announce.setImage(announceDtoIn.getImage());
-        announce.setPhone(announceDtoIn.getPhone());
-        announce.setPrice(announceDtoIn.getPrice());
-        announce.setTitle(announceDtoIn.getTitle());
+        announce.setAuthor(author);
+        announce.setImage(image);
+        announce.setDescription(dto.getDescription());
+        announce.setPrice(dto.getPrice());
+        announce.setTitle(dto.getTitle());
         return announce;
     }
 }

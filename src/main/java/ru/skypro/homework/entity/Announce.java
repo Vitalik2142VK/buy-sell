@@ -16,13 +16,13 @@ public class Announce {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private int pk;
-    private String authorFirstName;
-    private String authorLastName;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "fk_comments_users"))
+    private User author;
+
     private String description;
-    private String email;
     private String image;
-    private String phone;
     private int price;
     private String title;
 
