@@ -26,13 +26,4 @@ public class CommentDto {
     @Schema(description = "текст комментария")
     private String text;
 
-    public CommentDto(Comment comment) {
-        this.author = comment.getAuthor().getId();
-        this.authorImage = comment.getAuthor().getImage();
-        this.authorFirstName = comment.getAuthor().getFirstName();
-        this.createdAt = comment.getCreatedAt();
-        this.pk = comment.getId();
-        this.text = comment.getText();
-    }
-
 }

@@ -78,7 +78,7 @@ public class AnnounceController {
                     content = {@Content(schema = @Schema(hidden = true))
                     })
     })
-    @GetMapping("{id]")
+    @GetMapping("{id}")
     public ResponseEntity<?> get(@PathVariable Integer id) {
         return ResponseEntity.status(HttpStatus.OK).body(announceService.get(id));
     }
@@ -98,7 +98,7 @@ public class AnnounceController {
                     content = {@Content(schema = @Schema(hidden = true))
                     })
     })
-    @DeleteMapping("{id]")
+    @DeleteMapping("{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id) {
         announceService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -120,7 +120,7 @@ public class AnnounceController {
                     content = {@Content(schema = @Schema(hidden = true))
                     })
     })
-    @PatchMapping("{id]")
+    @PatchMapping("{id}")
     public ResponseEntity<?> updateInfo(@PathVariable Integer id,
                                         @RequestParam CreateOrUpdateAd property) {
         return ResponseEntity.status(HttpStatus.OK).body(announceService.updateInfo(id, property));
@@ -159,7 +159,7 @@ public class AnnounceController {
                     content = {@Content(schema = @Schema(hidden = true))
                     })
     })
-    @PatchMapping(value = "{id]/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateImage(@PathVariable Integer id,
                                          @RequestPart MultipartFile image) {
         try {
