@@ -1,18 +1,22 @@
 package ru.skypro.homework.service;
 
-import ru.skypro.homework.dto.comment.Comment;
-import ru.skypro.homework.dto.comment.Comments;
-import ru.skypro.homework.dto.comment.CreateOrUpdateComment;
-
-import java.util.List;
+import org.springframework.security.core.Authentication;
+import ru.skypro.homework.dto.comment.CommentDto;
+import ru.skypro.homework.dto.comment.CommentsDto;
+import ru.skypro.homework.dto.comment.CreateOrUpdateCommentDto;
 
 public interface CommentService {
 
-    Comments findAllAdComments(Integer id);
+    CommentsDto findAllAdComments(Integer adId);
 
-    Comment createComment(Integer id, CreateOrUpdateComment createOrUpdateComment);
+    CommentDto createComment(Integer id,
+                             CreateOrUpdateCommentDto createOrUpdateCommentDto,
+                             Authentication authentication);
 
-    boolean deleteAdComment(Integer adId, Integer commentId);
+    boolean deleteAdComment(Integer adId, Integer commentId,
+                            Authentication authentication);
 
-    Comment updateComment(Integer adId, Integer commentId, CreateOrUpdateComment createOrUpdateComment);
+    CommentDto updateComment(Integer adId, Integer commentId,
+                             CreateOrUpdateCommentDto createOrUpdateCommentDto,
+                             Authentication authentication);
 }

@@ -1,15 +1,15 @@
 package ru.skypro.homework.dto.comment;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import ru.skypro.homework.entity.Comment;
 
 @Data
-public class Comment {
+public class CommentDto {
 
     @Schema(description = "id автора объявления")
-    private long author;
+    private int author;
 
     @Schema(description = "ссылка на аватар автора комментария")
     private String authorImage;
@@ -18,10 +18,10 @@ public class Comment {
     private String authorFirstName;
 
     @Schema(description = "дата и время создания комментария в миллисекундах с 00:00:00 01.01.1970")
-    private Integer createdAt;
+    private long createdAt;
 
     @Schema(description = "id комментария")
-    private Integer pk;
+    private int pk;
 
     @Schema(description = "текст комментария")
     private String text;
