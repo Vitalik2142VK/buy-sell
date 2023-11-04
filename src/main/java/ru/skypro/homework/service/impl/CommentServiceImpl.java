@@ -35,25 +35,20 @@ public class CommentServiceImpl implements CommentService {
         }
         List<Comment> listComments = commentRepository.findAllByAd_IdOrderByCreatedAtDesc(adId);
 
-//        return CommentsDto.builder()
-//                .results(toCommentDtoConverter.convertAll(listComments))
-//                .count(listComments.size())
-//                .build();
         return (CommentsDto) listComments;
+        //TODO: возможно заменим на объект Pair...
     }
 
     @Override
     public CommentDto createComment(Integer id, CreateOrUpdateCommentDto createOrUpdateComment,
                                     Authentication authentication) {
-
-//        Announce announce = announceRepository.findById(id).orElseThrow();
-//        User currentUSer = userRepository.findFirstByName(authentication.getName()).orElseThrow();
-//        Comment comment = commentMapper.mapToNewComment(createOrUpdateComment);
-//        comment.setAd(announce);
-//        comment.setAuthor(currentUSer);
-//        Comment saved = commentRepository.save(comment);
-        return commentMapper.mapToCommentDto(null);
-
+        Announce announce = announceRepository.findById(id).orElseThrow();
+        User currentUSer = userRepository.findFirstByFirstName(authentication.getName()).orElseThrow();
+        Comment comment = commentMapper.mapToNewComment(createOrUpdateComment);
+        comment.setAd(announce);
+        comment.setAuthor(currentUSer);
+        Comment saved = commentRepository.save(comment);
+        return commentMapper.mapToCommentDto(saved);
     }
 
     @Override
@@ -74,7 +69,6 @@ public class CommentServiceImpl implements CommentService {
         }
         commentRepository.delete(comment);
         return true;
-
     }
 
     @Override
@@ -95,8 +89,6 @@ public class CommentServiceImpl implements CommentService {
         comment.setText(createOrUpdateCommentDto.getText());
         commentRepository.save(comment);
         return commentMapper.mapToCommentDto(comment);
-
     }
-
 
 }
