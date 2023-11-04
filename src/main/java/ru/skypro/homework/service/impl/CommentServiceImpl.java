@@ -37,7 +37,9 @@ public class CommentServiceImpl implements CommentService {
             return null;
         }
         List<Comment> listComments = commentRepository.findAllByAd_IdOrderByCreatedAtDesc(adId);
+      
         return (CommentsDto) listComments;
+        //TODO: возможно заменим на объект Pair...
     }
 
     /**
@@ -46,7 +48,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDto createComment(Integer id, CreateOrUpdateCommentDto createOrUpdateComment,
                                     Authentication authentication) {
-
         Announce announce = announceRepository.findById(id).orElseThrow();
         User currentUSer = userRepository.findFirstByFirstName(authentication.getName()).orElseThrow();
         Comment comment = commentMapper.mapToNewComment(createOrUpdateComment);
