@@ -46,13 +46,13 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto createComment(Integer id, CreateOrUpdateCommentDto createOrUpdateComment,
                                     Authentication authentication) {
 
-        Announce announce = announceRepository.findById(Long.valueOf(id)).orElseThrow();
-        User currentUSer = userRepository.findFirstByName(authentication.getName()).orElseThrow();
-        Comment comment = commentMapper.mapToNewComment(createOrUpdateComment);
-        comment.setAd(announce);
-        comment.setAuthor(currentUSer);
-        Comment saved = commentRepository.save(comment);
-        return commentMapper.mapToCommentDto(saved);
+//        Announce announce = announceRepository.findById(id).orElseThrow();
+//        User currentUSer = userRepository.findFirstByName(authentication.getName()).orElseThrow();
+//        Comment comment = commentMapper.mapToNewComment(createOrUpdateComment);
+//        comment.setAd(announce);
+//        comment.setAuthor(currentUSer);
+//        Comment saved = commentRepository.save(comment);
+        return commentMapper.mapToCommentDto(null);
 
     }
 
@@ -63,8 +63,8 @@ public class CommentServiceImpl implements CommentService {
             throw new IllegalArgumentException("adId or commentId variables must not be null!");
         }
         Comment comment = commentRepository.findById(commentId).orElseThrow();
-        User currentUSer = userRepository.findFirstByName(authentication.getName()).orElseThrow();
-        Announce announce = announceRepository.findById(Long.valueOf(adId)).orElseThrow();
+        User currentUSer = userRepository.findFirstByFirstName(authentication.getName()).orElseThrow();
+        Announce announce = announceRepository.findById(adId).orElseThrow();
 
         if (!comment.getAd().equals(announce)) {
             throw new IllegalArgumentException("not found");
@@ -85,8 +85,8 @@ public class CommentServiceImpl implements CommentService {
             return null;
         }
         Comment comment = commentRepository.findById(commentId).orElseThrow();
-        User currentUSer = userRepository.findFirstByName(authentication.getName()).orElseThrow();
-        Announce announce = announceRepository.findById(Long.valueOf(adId)).orElseThrow();
+        User currentUSer = userRepository.findFirstByFirstName(authentication.getName()).orElseThrow();
+        Announce announce = announceRepository.findById(adId).orElseThrow();
         if (!comment.getAd().equals(announce)) {
             throw new IllegalArgumentException("not found");
         } else if (!comment.getAuthor().equals(currentUSer)) {

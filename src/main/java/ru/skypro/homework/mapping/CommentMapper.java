@@ -15,7 +15,13 @@ import java.util.stream.Collectors;
 public class CommentMapper {
 
     public CommentDto mapToCommentDto(Comment comment) {
-        CommentDto commentDto = new CommentDto(comment);
+        CommentDto commentDto = new CommentDto();
+        commentDto.setAuthor(comment.getAuthor().getId());
+        commentDto.setAuthorImage(comment.getAuthor().getImage());
+        commentDto.setAuthorFirstName(comment.getAuthor().getFirstName());
+        commentDto.setCreatedAt(comment.getCreatedAt());
+        commentDto.setPk(comment.getId());
+        commentDto.setText(comment.getText());
         return commentDto;
     }
 

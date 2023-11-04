@@ -5,6 +5,6 @@ import ru.skypro.homework.entity.Announce;
 
 import java.util.List;
 
-public interface AnnounceRepository extends JpaRepository<Announce, Long> {
-    List<Announce> findAllByPk(Long pk);
+public interface AnnounceRepository extends JpaRepository<Announce, Integer> {
+
 }

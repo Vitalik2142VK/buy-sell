@@ -61,7 +61,8 @@ public class AnnounceController {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(announceService.add(properties, image));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            //TODO добавить лог
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
@@ -78,8 +79,8 @@ public class AnnounceController {
                     content = {@Content(schema = @Schema(hidden = true))
                     })
     })
-    @GetMapping("{id]")
-    public ResponseEntity<?> get(@PathVariable Long id) {
+    @GetMapping("{id}")
+    public ResponseEntity<?> get(@PathVariable Integer id) {
         return ResponseEntity.status(HttpStatus.OK).body(announceService.get(id));
     }
 
@@ -98,8 +99,8 @@ public class AnnounceController {
                     content = {@Content(schema = @Schema(hidden = true))
                     })
     })
-    @DeleteMapping("{id]")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> delete(@PathVariable Integer id) {
         announceService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -120,9 +121,9 @@ public class AnnounceController {
                     content = {@Content(schema = @Schema(hidden = true))
                     })
     })
-    @PatchMapping("{id]")
-    public ResponseEntity<?> updateInfo(@PathVariable Long id,
-                                        @RequestParam CreateOrUpdateAd property) {
+    @PatchMapping("{id}")
+    public ResponseEntity<?> updateInfo(@PathVariable Integer id,
+                                        @RequestBody CreateOrUpdateAd property) {
         return ResponseEntity.status(HttpStatus.OK).body(announceService.updateInfo(id, property));
     }
 
@@ -159,14 +160,15 @@ public class AnnounceController {
                     content = {@Content(schema = @Schema(hidden = true))
                     })
     })
-    @PatchMapping(value = "{id]/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateImage(@PathVariable Long id,
+    @PatchMapping(value = "{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateImage(@PathVariable Integer id,
                                          @RequestPart MultipartFile image) {
         try {
             announceService.updateImage(id, image);
             return ResponseEntity.status(HttpStatus.OK).body("string");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            //TODO добавить лог
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 }

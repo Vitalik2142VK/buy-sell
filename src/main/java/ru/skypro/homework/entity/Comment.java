@@ -17,7 +17,7 @@ public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "fk_comments_users"))
@@ -27,10 +27,8 @@ public class Comment {
     @JoinColumn(name = "ad_id", foreignKey = @ForeignKey(name = "fk_comments_ads"))
     private Announce ad;
 
-    @Column(name = "created_at")
     private long createdAt;
-
-    @Column(name = "text")
+    @Column(name = "text_comment")
     private String text;
 
     @Override
@@ -45,5 +43,4 @@ public class Comment {
     public int hashCode() {
         return Objects.hash(id);
     }
-
 }

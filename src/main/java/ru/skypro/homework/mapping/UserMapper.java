@@ -8,23 +8,23 @@ import ru.skypro.homework.repository.UserRepository;
 
 @Component
 public class UserMapper {
-    private final UserRepository userRepository;
 
-    public UserMapper(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserDto mapToUserDto(User user) {
+        UserDto dto = new UserDto();
+        dto.setId(user.getId());
+        dto.setEmail(user.getEmail());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setPhone(user.getPhone());
+        dto.setRole(user.getRole());
+        dto.setImage(user.getImage());
+        return dto;
     }
 
-    public UserDto mapToUserDto(int id) {
-        User user = userRepository.findById(id).orElseThrow();
-        return new UserDto(user);
-    }
-
-    public UserChangeDto mapToUserForUserChangeDto(UserChangeDto dto, int id) {
-        User user = userRepository.findById(id).orElseThrow();
+    public User mapToUserForUserChangeDto(UserChangeDto dto, User user) {
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         user.setPhone(dto.getPhone());
-        userRepository.save(user);
-        return dto;
+        return user;
     }
 }

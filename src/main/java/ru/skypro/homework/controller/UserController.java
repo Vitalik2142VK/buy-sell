@@ -11,9 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.homework.dto.comment.CommentsDto;
 import ru.skypro.homework.dto.user.NewPasswordUser;
 import ru.skypro.homework.dto.user.UserChangeDto;
+import ru.skypro.homework.dto.user.UserDto;
 import ru.skypro.homework.service.UserService;
 
 @CrossOrigin(value = "http://localhost:3000")
@@ -57,7 +57,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = CommentsDto.class))
+                            schema = @Schema(implementation = UserDto.class))
                     }),
             @ApiResponse(responseCode = "401", description = "Unauthorized",
                     content = {@Content(schema = @Schema(hidden = true))
@@ -76,7 +76,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = CommentsDto.class))
+                            schema = @Schema(implementation = UserChangeDto.class))
                     }),
             @ApiResponse(responseCode = "401", description = "Unauthorized",
                     content = {@Content(schema = @Schema(hidden = true))
