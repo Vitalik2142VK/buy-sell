@@ -26,6 +26,11 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
     private final CommentMapper commentMapper;
 
+    /**
+     * Метод ищет и возвращает список всех комментариев к объявлению по id объявления
+     * -----||-----
+     * The method searches for and returns a list of all comments to the ad by the ad id
+     */
     @Override
     public CommentsDto findAllAdComments(Integer adId) {
 
@@ -34,28 +39,32 @@ public class CommentServiceImpl implements CommentService {
             return null;
         }
         List<Comment> listComments = commentRepository.findAllByAd_IdOrderByCreatedAtDesc(adId);
-
-//        return CommentsDto.builder()
-//                .results(toCommentDtoConverter.convertAll(listComments))
-//                .count(listComments.size())
-//                .build();
         return (CommentsDto) listComments;
     }
 
+    /**
+     * Метод создает комментарий к объявлению по id объявления
+     * -----||-----
+     * The method creates a comment to the ad by the ad id
+     */
     @Override
     public CommentDto createComment(Integer id, CreateOrUpdateCommentDto createOrUpdateComment,
                                     Authentication authentication) {
 
-//        Announce announce = announceRepository.findById(id).orElseThrow();
-//        User currentUSer = userRepository.findFirstByName(authentication.getName()).orElseThrow();
-//        Comment comment = commentMapper.mapToNewComment(createOrUpdateComment);
-//        comment.setAd(announce);
-//        comment.setAuthor(currentUSer);
-//        Comment saved = commentRepository.save(comment);
-        return commentMapper.mapToCommentDto(null);
-
+        Announce announce = announceRepository.findById(id).orElseThrow();
+        User currentUSer = userRepository.findFirstByFirstName(authentication.getName()).orElseThrow();
+        Comment comment = commentMapper.mapToNewComment(createOrUpdateComment);
+        comment.setAd(announce);
+        comment.setAuthor(currentUSer);
+        Comment saved = commentRepository.save(comment);
+        return commentMapper.mapToCommentDto(saved);
     }
 
+    /**
+     * Метод удаляет комментарий к объявлению по id объявления и id комментария
+     * -----||-----
+     * The method deletes the comment to the ad by the ad id and comment id
+     */
     @Override
     public boolean deleteAdComment(Integer adId, Integer commentId,
                                    Authentication authentication) {
@@ -74,9 +83,13 @@ public class CommentServiceImpl implements CommentService {
         }
         commentRepository.delete(comment);
         return true;
-
     }
 
+    /**
+     * Метод обновляет комментарий к объявлению по id объявления и id комментария
+     * -----||-----
+     * The method update the comment to the ad by the ad id and comment id
+     */
     @Override
     public CommentDto updateComment(Integer adId, Integer commentId,
                                     CreateOrUpdateCommentDto createOrUpdateCommentDto,
@@ -95,8 +108,5 @@ public class CommentServiceImpl implements CommentService {
         comment.setText(createOrUpdateCommentDto.getText());
         commentRepository.save(comment);
         return commentMapper.mapToCommentDto(comment);
-
     }
-
-
 }
