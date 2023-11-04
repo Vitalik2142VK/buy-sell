@@ -141,6 +141,7 @@ public class AnnounceController {
     public ResponseEntity<?> getUsersAll() {
         List<AnnounceDtoOut> results = announceService.getUsersAll();
         long count = results.size();
+        //TODO заменить на DTO
         return ResponseEntity.status(HttpStatus.OK).body(Pair.of(count, results));
     }
 
