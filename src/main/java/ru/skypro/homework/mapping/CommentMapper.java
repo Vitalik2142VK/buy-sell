@@ -16,8 +16,6 @@ import java.util.stream.Collectors;
 public class CommentMapper {
 
     /**
-     * Метод, преобразующий объект класса Comment в объект класса CommentDto.
-     * -----||-----
      * A method that converts an object of the Comment class to an object of the CommentDto class.
      */
     public CommentDto mapToCommentDto(Comment comment) {
@@ -32,8 +30,6 @@ public class CommentMapper {
     }
 
     /**
-     * Метод, преобразующий объект класса CommentDto в объект класса Comment.
-     * -----||-----
      * A method that converts an object of the CommentDto class to an object of the Comment class.
      */
     public Comment mapToNewComment(CreateOrUpdateCommentDto commentDto) {
@@ -44,8 +40,6 @@ public class CommentMapper {
     }
 
     /**
-     * Метод, преобразующий коллекцию класса Comment в коллекцию класса CommentsDto.
-     * -----||-----
      * A method that converts a collection of the Comment class to a collection of the CommentsDto class.
      */
     public CommentsDto CommentListToCommentDtoList(List<Comment> comments) {

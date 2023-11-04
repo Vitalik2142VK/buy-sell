@@ -27,8 +27,6 @@ public class CommentServiceImpl implements CommentService {
     private final CommentMapper commentMapper;
 
     /**
-     * Метод ищет и возвращает список всех комментариев к объявлению по id объявления
-     * -----||-----
      * The method searches for and returns a list of all comments to the ad by the ad id
      */
     @Override
@@ -43,8 +41,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * Метод создает комментарий к объявлению по id объявления
-     * -----||-----
      * The method creates a comment to the ad by the ad id
      */
     @Override
@@ -61,8 +57,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * Метод удаляет комментарий к объявлению по id объявления и id комментария
-     * -----||-----
      * The method deletes the comment to the ad by the ad id and comment id
      */
     @Override
@@ -86,8 +80,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * Метод обновляет комментарий к объявлению по id объявления и id комментария
-     * -----||-----
      * The method update the comment to the ad by the ad id and comment id
      */
     @Override
