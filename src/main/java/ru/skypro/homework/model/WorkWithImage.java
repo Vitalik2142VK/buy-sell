@@ -18,15 +18,7 @@ public class WorkWithImage {
         Path filePath = Path.of(directory, name + "." + getExtensions(image.getOriginalFilename()));
         Files.createDirectories(filePath.getParent());
         Files.deleteIfExists(filePath);
-
-        try (InputStream is = image.getInputStream();
-             OutputStream os = Files.newOutputStream(filePath, CREATE_NEW);
-             BufferedInputStream bis = new BufferedInputStream(is);
-             BufferedOutputStream bos = new BufferedOutputStream(os);
-        ){
-            bis.transferTo(bos);
-        }
-
+        Files.write(filePath, image.getBytes());
         return filePath.toString();
     }
 

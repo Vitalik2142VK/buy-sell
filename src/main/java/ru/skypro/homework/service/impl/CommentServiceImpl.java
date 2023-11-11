@@ -1,7 +1,9 @@
 package ru.skypro.homework.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.comment.CommentDto;
 import ru.skypro.homework.dto.comment.CommentsDto;
@@ -15,6 +17,7 @@ import ru.skypro.homework.repository.CommentRepository;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.CommentService;
 
+import java.security.Principal;
 import java.util.List;
 
 @Service
@@ -49,7 +52,7 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto createComment(Integer id, CreateOrUpdateCommentDto createOrUpdateComment,
                                     Authentication authentication) {
         Announce announce = announceRepository.findById(id).orElseThrow();
-        User currentUSer = userRepository.findFirstByFirstName(authentication.getName()).orElseThrow();
+        User currentUSer = userRepository.findFirstByEmail(authentication.getName()).orElseThrow();
         Comment comment = commentMapper.mapToNewComment(createOrUpdateComment);
         comment.setAd(announce);
         comment.setAuthor(currentUSer);
@@ -60,6 +63,7 @@ public class CommentServiceImpl implements CommentService {
     /**
      * The method deletes the comment to the ad by the ad id and comment id
      */
+    @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.checkAuthor(principal, #commentId)")
     @Override
     public boolean deleteAdComment(Integer adId, Integer commentId,
                                    Authentication authentication) {
@@ -67,7 +71,7 @@ public class CommentServiceImpl implements CommentService {
             throw new IllegalArgumentException("adId or commentId variables must not be null!");
         }
         Comment comment = commentRepository.findById(commentId).orElseThrow();
-        User currentUSer = userRepository.findFirstByFirstName(authentication.getName()).orElseThrow();
+        User currentUSer = userRepository.findFirstByEmail(authentication.getName()).orElseThrow();
         Announce announce = announceRepository.findById(adId).orElseThrow();
 
         if (!comment.getAd().equals(announce)) {
@@ -91,7 +95,7 @@ public class CommentServiceImpl implements CommentService {
             return null;
         }
         Comment comment = commentRepository.findById(commentId).orElseThrow();
-        User currentUSer = userRepository.findFirstByFirstName(authentication.getName()).orElseThrow();
+        User currentUSer = userRepository.findFirstByEmail(authentication.getName()).orElseThrow();
         Announce announce = announceRepository.findById(adId).orElseThrow();
         if (!comment.getAd().equals(announce)) {
             throw new IllegalArgumentException("not found");
@@ -101,5 +105,14 @@ public class CommentServiceImpl implements CommentService {
         comment.setText(createOrUpdateCommentDto.getText());
         commentRepository.save(comment);
         return commentMapper.mapToCommentDto(comment);
+    }
+
+
+    //todo переписать метод
+    public boolean checkAuthor(Principal principal, int commentId) {
+        Announce announce = announceRepository.findById(commentId).orElseThrow();
+        User user = announce.getAuthor();
+
+        return user.getEmail().equals(principal.getName());
     }
 }

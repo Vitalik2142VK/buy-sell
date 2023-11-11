@@ -9,11 +9,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.user.NewPasswordUser;
 import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.dto.user.UserDto;
+import ru.skypro.homework.exception.NotFoundUserException;
 import ru.skypro.homework.service.UserService;
 
 import java.io.IOException;
@@ -66,10 +69,11 @@ public class UserController {
                     })
     })
     @GetMapping("/me")
-    public ResponseEntity<?> getUser() {
-        if (userService.userLogged()) {
-            return ResponseEntity.ok(userService.getUserDto());
-        } else {
+    public ResponseEntity<?> getUser(@AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            return ResponseEntity.ok(userService.getUserDto(userDetails));
+        } catch (NotFoundUserException e) {
+            //todo добавить логги
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }

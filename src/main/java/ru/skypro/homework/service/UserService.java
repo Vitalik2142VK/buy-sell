@@ -1,5 +1,6 @@
 package ru.skypro.homework.service;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.user.NewPasswordUser;
 import ru.skypro.homework.dto.user.UserChangeDto;
@@ -13,7 +14,7 @@ public interface UserService {
 
     boolean changePassword(NewPasswordUser newPassword);
 
-    UserDto getUserDto();
+    UserDto getUserDto(UserDetails userDetails);
 
     UserChangeDto putUser(UserChangeDto userChange);
 

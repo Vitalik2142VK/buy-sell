@@ -6,5 +6,5 @@ import ru.skypro.homework.entity.User;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
-    Optional<User> findFirstByFirstName(String name);
+    Optional<User> findFirstByEmail(String email);
 }

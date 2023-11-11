@@ -1,8 +1,12 @@
 package ru.skypro.homework.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.component.UserAuthDetailsService;
 import ru.skypro.homework.dto.user.NewPasswordUser;
 import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.dto.user.UserDto;
@@ -14,8 +18,6 @@ import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.UserService;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -48,9 +50,9 @@ public class UserServiceImpl implements UserService {
      * Provides data about the current user.
      */
     @Override
-    public UserDto getUserDto() {
-        int id = 1; //TODO Заменить поиск Id от пользователя
-        return userMapper.mapToUserDto(userRepository.findById(id).orElseThrow(NotFoundUserException::new));
+    public UserDto getUserDto(UserDetails userDetails) {
+        User user = userRepository.findFirstByEmail(userDetails.getUsername()).orElseThrow(NotFoundUserException::new);
+        return userMapper.mapToUserDto(user);
     }
 
     /**
