@@ -5,6 +5,8 @@ import ru.skypro.homework.dto.user.NewPasswordUser;
 import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.dto.user.UserDto;
 
+import java.io.IOException;
+
 public interface UserService {
 
     boolean userLogged();
@@ -15,5 +17,5 @@ public interface UserService {
 
     UserChangeDto putUser(UserChangeDto userChange);
 
-    void putUserImage(MultipartFile image);
+    void putUserImage(MultipartFile image) throws IOException;
 }

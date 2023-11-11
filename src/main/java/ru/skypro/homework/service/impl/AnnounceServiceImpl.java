@@ -25,12 +25,21 @@ public class AnnounceServiceImpl implements AnnounceService {
         this.announceMapper = announceMapper;
     }
 
+    /**
+     *
+     * the method returns all announces
+     */
     @Override
     public List<AnnounceDtoOut> getUsersAll() {
         return announceRepository.findAll().stream()
                 .map(announceMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    /**
+     *
+     * the method returns all user announces
+     */
 
     @Override
     public List<AnnounceDtoOut> getAll() {
@@ -40,6 +49,11 @@ public class AnnounceServiceImpl implements AnnounceService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     *
+     * the method returns announce by id
+     */
+
     @Override
     public AnnounceDto get(Integer id) {
         Announce announce = announceRepository.findById(id)
@@ -48,6 +62,10 @@ public class AnnounceServiceImpl implements AnnounceService {
         return announceMapper.mapToAnnounceDto(announce);
     }
 
+    /**
+     *
+     * the method add announce
+     */
     @Override
     public AnnounceDtoOut add(CreateOrUpdateAd properties, MultipartFile image) throws IOException {
         AnnounceDto announceDtoIn = new AnnounceDto();
@@ -64,6 +82,11 @@ public class AnnounceServiceImpl implements AnnounceService {
         return announceMapper.toDTO(announceRepository.save(announceMapper.createdAd(properties, null, null))); //TODO заменить null на путь к картинке и автора объявления
     }
 
+    /**
+     *
+     * the method update announce info
+     */
+
     @Override
     public AnnounceDtoOut updateInfo(Integer id, CreateOrUpdateAd property) {
         //TODO Заменить на логер
@@ -75,6 +98,10 @@ public class AnnounceServiceImpl implements AnnounceService {
         return announceMapper.toDTO(announceRepository.save(announce));
     }
 
+    /**
+     *
+     * the method update announce image
+     */
     @Override
     public void updateImage(Integer id, MultipartFile image) throws IOException {
         Announce announce = announceRepository.findById(id)
@@ -83,6 +110,10 @@ public class AnnounceServiceImpl implements AnnounceService {
         announce.setImage(Arrays.toString(image.getBytes()));
     }
 
+    /**
+     *
+     * the method delete announce
+     */
     @Override
     public void delete(Integer id) {
         announceRepository.delete(

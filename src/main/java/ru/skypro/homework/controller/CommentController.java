@@ -29,10 +29,6 @@ public class CommentController {
 
     private final CommentService commentService;
 
-//    public CommentController(CommentService commentService) {
-//        this.commentService = commentService;
-//    }
-
     @Operation(summary = "Получение всех комментариев объявления")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",

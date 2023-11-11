@@ -16,6 +16,8 @@ import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.dto.user.UserDto;
 import ru.skypro.homework.service.UserService;
 
+import java.io.IOException;
+
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequestMapping("/users")
@@ -103,7 +105,11 @@ public class UserController {
     @PatchMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> putUserImage(@RequestParam MultipartFile image) {
         if (userService.userLogged()) {
-            userService.putUserImage(image);
+            try {
+                userService.putUserImage(image);
+            } catch (IOException e) {
+                //TODO добавить лог
+            }
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
