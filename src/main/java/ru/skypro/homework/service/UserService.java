@@ -10,13 +10,11 @@ import java.io.IOException;
 
 public interface UserService {
 
-    boolean userLogged();
-
-    boolean changePassword(NewPasswordUser newPassword);
+    boolean changePassword(NewPasswordUser newPassword, UserDetails userDetails);
 
     UserDto getUserDto(UserDetails userDetails);
 
-    UserChangeDto putUser(UserChangeDto userChange);
+    UserChangeDto putUser(UserChangeDto userChange, UserDetails userDetails);
 
-    void putUserImage(MultipartFile image) throws IOException;
+    void putUserImage(MultipartFile image, UserDetails userDetails) throws IOException;
 }

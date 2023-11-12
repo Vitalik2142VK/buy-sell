@@ -1,11 +1,14 @@
 package ru.skypro.homework.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.component.UserAuthDetailsService;
+import ru.skypro.homework.controller.UserController;
 import ru.skypro.homework.dto.Register;
 import ru.skypro.homework.exception.UserExistException;
 import ru.skypro.homework.repository.UserRepository;
@@ -13,6 +16,8 @@ import ru.skypro.homework.service.AuthService;
 
 @Service
 public class AuthServiceImpl implements AuthService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     private final UserAuthDetailsService detailsService;
     private final PasswordEncoder encoder;
@@ -53,7 +58,7 @@ public class AuthServiceImpl implements AuthService {
         user.setPhone(register.getPhone());
         user.setRole(register.getRole());
         userRepository.save(user);
-        //TODO добавить логги о добавлении нового пользователя
+        LOGGER.debug("Add new " + user.getRole().toString() + ": " + user.getFirstName() + " " + user.getLastName());
         return true;
     }
 

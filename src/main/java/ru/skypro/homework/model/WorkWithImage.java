@@ -5,8 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static java.nio.file.StandardOpenOption.CREATE_NEW;
+import java.nio.file.Paths;
 
 public class WorkWithImage {
     private WorkWithImage() {}
@@ -26,12 +25,19 @@ public class WorkWithImage {
      * Update the image.
      */
     public static String updateAndGetStringImage(String directory, String oldImage, MultipartFile image) throws IOException {
-        String name = oldImage.substring(oldImage.lastIndexOf('/') + 1, oldImage.lastIndexOf('.'));
+        String name = oldImage.substring(oldImage.lastIndexOf('\\') + 1, oldImage.lastIndexOf('.'));
 
         Path pathOld = Path.of(oldImage);
         Files.deleteIfExists(pathOld);
 
         return saveAndGetStringImage(directory, name, image);
+    }
+
+    /**
+     * Load the image.
+     */
+    public static byte[] loadImage(String imagePath) throws IOException {
+        return  Files.readAllBytes(Paths.get(imagePath));
     }
 
     private static String getExtensions(String fileName) {
