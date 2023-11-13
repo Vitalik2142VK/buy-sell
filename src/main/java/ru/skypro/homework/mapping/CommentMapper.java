@@ -50,6 +50,5 @@ public class CommentMapper {
                 .map(this::mapToCommentDto).collect(Collectors.toList());
         dto.setResults(commentDtoList);
         return dto;
-        //TODO: возможно будет удалён (Pair.class)...
     }
 }

@@ -1,6 +1,8 @@
 package ru.skypro.homework.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +13,9 @@ import ru.skypro.homework.dto.comment.CreateOrUpdateCommentDto;
 import ru.skypro.homework.entity.Announce;
 import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.entity.User;
+import ru.skypro.homework.exception.CommentNotFoundException;
+import ru.skypro.homework.exception.NotFoundUserException;
+import ru.skypro.homework.exception.UserNotAuthorCommentException;
 import ru.skypro.homework.mapping.CommentMapper;
 import ru.skypro.homework.repository.AnnounceRepository;
 import ru.skypro.homework.repository.CommentRepository;
@@ -24,6 +29,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommentServiceImpl.class);
+
     private final CommentRepository commentRepository;
     private final AnnounceRepository announceRepository;
     private final UserRepository userRepository;
@@ -35,14 +42,15 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentsDto findAllAdComments(Integer adId) {
 
+        LOGGER.info("Was invoked method findAllAdComments by adId = {}", adId);
+
         if (adId == null) {
             //TODO: исправить на согласованный вариант возврата пустого списка
             return null;
         }
         List<Comment> listComments = commentRepository.findAllByAd_IdOrderByCreatedAtDesc(adId);
-      
+
         return (CommentsDto) listComments;
-        //TODO: возможно заменим на объект Pair...
     }
 
     /**
@@ -50,9 +58,10 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public CommentDto createComment(Integer id, CreateOrUpdateCommentDto createOrUpdateComment,
-                                    Authentication authentication) {
+                                    UserDetails userDetails) {
+        LOGGER.info("Was invoked method createComment by adId = {}", id);
         Announce announce = announceRepository.findById(id).orElseThrow();
-        User currentUSer = userRepository.findFirstByEmail(authentication.getName()).orElseThrow();
+        User currentUSer = userRepository.findFirstByEmail(userDetails.getUsername()).orElseThrow(NotFoundUserException::new);
         Comment comment = commentMapper.mapToNewComment(createOrUpdateComment);
         comment.setAd(announce);
         comment.setAuthor(currentUSer);
@@ -63,23 +72,19 @@ public class CommentServiceImpl implements CommentService {
     /**
      * The method deletes the comment to the ad by the ad id and comment id
      */
-    @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.checkAuthor(principal, #commentId)")
     @Override
-    public boolean deleteAdComment(Integer adId, Integer commentId,
-                                   Authentication authentication) {
+    @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.checkAuthor(principal, #commentId)")
+    public boolean deleteAdComment(Integer adId, Integer commentId) {
+
+        LOGGER.info("Was invoked method deleteAdComment by adId = {} and commentId = {}", adId, commentId);
         if (adId == null || commentId == null) {
             throw new IllegalArgumentException("adId or commentId variables must not be null!");
         }
-        Comment comment = commentRepository.findById(commentId).orElseThrow();
-        User currentUSer = userRepository.findFirstByEmail(authentication.getName()).orElseThrow();
         Announce announce = announceRepository.findById(adId).orElseThrow();
-
-        if (!comment.getAd().equals(announce)) {
-            throw new IllegalArgumentException("not found");
-        }
-        if (!comment.getAuthor().equals(currentUSer)) {
-            throw new IllegalArgumentException("not permit");
-        }
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+//        if (!comment.getAd().equals(announce)) {
+//            throw new CommentNotFoundException();
+//        }
         commentRepository.delete(comment);
         return true;
     }
@@ -88,31 +93,36 @@ public class CommentServiceImpl implements CommentService {
      * The method update the comment to the ad by the ad id and comment id
      */
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.checkAuthor(principal, #commentId)")
     public CommentDto updateComment(Integer adId, Integer commentId,
-                                    CreateOrUpdateCommentDto createOrUpdateCommentDto,
-                                    Authentication authentication) {
+                                    CreateOrUpdateCommentDto createOrUpdateCommentDto) {
+
+        LOGGER.info("Was invoked method updateComment by adId = {} and commentId = {}", adId, commentId);
         if (commentId == null) {
-            return null;
+            throw new NullPointerException();
+            //TODO добавить логгер
         }
-        Comment comment = commentRepository.findById(commentId).orElseThrow();
-        User currentUSer = userRepository.findFirstByEmail(authentication.getName()).orElseThrow();
-        Announce announce = announceRepository.findById(adId).orElseThrow();
-        if (!comment.getAd().equals(announce)) {
-            throw new IllegalArgumentException("not found");
-        } else if (!comment.getAuthor().equals(currentUSer)) {
-            throw new IllegalArgumentException("not permit");
-        }
+
+        Announce announce = announceRepository.findById(adId).orElseThrow(); //TODO Заменить на exception отсутствия объявления
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+//        if (!comment.getAd().equals(announce)) {
+//            throw new CommentNotFoundException();
+//        }
         comment.setText(createOrUpdateCommentDto.getText());
         commentRepository.save(comment);
         return commentMapper.mapToCommentDto(comment);
     }
 
-
-    //todo переписать метод
+    /**
+     * The method checks the author of the ad
+     */
     public boolean checkAuthor(Principal principal, int commentId) {
-        Announce announce = announceRepository.findById(commentId).orElseThrow();
-        User user = announce.getAuthor();
-
-        return user.getEmail().equals(principal.getName());
+        User user = userRepository.findFirstByEmail(principal.getName()).orElseThrow(NotFoundUserException::new);
+        //TODO добавить и сравнить с комментарием(если query не работает)
+        if (!commentRepository.checkAuthorComment(commentId, user.getId())) {
+            throw new UserNotAuthorCommentException();
+        }
+        return true;
     }
+
 }
