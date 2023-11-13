@@ -11,3 +11,7 @@ CREATE TABLE users(
     image TEXT,
     CONSTRAINT user_pkey PRIMARY KEY (id)
 );
+
+-- changeset vKvs: Add_column_password_and_constraint_email
+ALTER TABLE users ADD COLUMN "password" CHARACTER VARYING (255) NOT NULL;
+ALTER TABLE users ADD CONSTRAINT unique_email UNIQUE (email);

@@ -16,7 +16,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
+    @Column(unique = true)
     private String email;
+    private String password;
     private String firstName;
     private String lastName;
     private String phone;
@@ -35,5 +37,11 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "User_" + id +
+                "_lg_" + email.hashCode();
     }
 }
