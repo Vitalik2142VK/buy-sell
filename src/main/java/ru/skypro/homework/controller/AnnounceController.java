@@ -10,6 +10,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.announce.AnnounceDtoOut;
@@ -45,6 +47,24 @@ public class AnnounceController {
         return ResponseEntity.status(HttpStatus.OK).body(Pair.of(count, results));
     }
 
+    @Operation(summary = "Получение объявлений авторизированного пользователя")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = Announce.class))
+                    }),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = {@Content(schema = @Schema(hidden = true))
+                    })
+    })
+    @GetMapping("me")
+    public ResponseEntity<?> getAllOfUser(@AuthenticationPrincipal UserDetails userDetails) {
+        List<AnnounceDtoOut> results = announceService.getAllOfUser(userDetails.getUsername());
+        long count = results.size();
+        //TODO заменить на DTO
+        return ResponseEntity.status(HttpStatus.OK).body(Pair.of(count, results));
+    }
+
     @Operation(summary = "Добавление объявления")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created",
@@ -57,9 +77,10 @@ public class AnnounceController {
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> add(@RequestPart CreateOrUpdateAd properties,
-                                 @RequestPart MultipartFile image) {
+                                 @RequestPart MultipartFile image,
+                                 @AuthenticationPrincipal UserDetails userDetails) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(announceService.add(properties, image));
+            return ResponseEntity.status(HttpStatus.CREATED).body(announceService.add(properties, image, userDetails.getUsername()));
         } catch (IOException e) {
             //TODO добавить лог
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -125,24 +146,6 @@ public class AnnounceController {
     public ResponseEntity<?> updateInfo(@PathVariable Integer id,
                                         @RequestBody CreateOrUpdateAd property) {
         return ResponseEntity.status(HttpStatus.OK).body(announceService.updateInfo(id, property));
-    }
-
-    @Operation(summary = "Получение объявлений авторизированного пользователя")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK",
-                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = Announce.class))
-                    }),
-            @ApiResponse(responseCode = "401", description = "Unauthorized",
-                    content = {@Content(schema = @Schema(hidden = true))
-                    })
-    })
-    @GetMapping("me")
-    public ResponseEntity<?> getUsersAll() {
-        List<AnnounceDtoOut> results = announceService.getUsersAll();
-        long count = results.size();
-        //TODO заменить на DTO
-        return ResponseEntity.status(HttpStatus.OK).body(Pair.of(count, results));
     }
 
     @Operation(summary = "Обновление картинки объявления")

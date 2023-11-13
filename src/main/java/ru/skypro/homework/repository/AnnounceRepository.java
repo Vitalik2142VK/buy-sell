@@ -6,5 +6,5 @@ import ru.skypro.homework.entity.Announce;
 import java.util.List;
 
 public interface AnnounceRepository extends JpaRepository<Announce, Integer> {
-
+    List<Announce> findAllById(Integer id);
 }
