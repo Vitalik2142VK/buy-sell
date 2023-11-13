@@ -42,9 +42,7 @@ public class AnnounceController {
     })
     @GetMapping
     public ResponseEntity<?> getAll() {
-        List<AnnounceDtoOut> results = announceService.getAll();
-        long count = results.size();
-        return ResponseEntity.status(HttpStatus.OK).body(Pair.of(count, results));
+        return ResponseEntity.status(HttpStatus.OK).body(announceService.getAll());
     }
 
     @Operation(summary = "Получение объявлений авторизированного пользователя")

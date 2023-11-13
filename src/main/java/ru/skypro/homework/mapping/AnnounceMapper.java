@@ -1,12 +1,19 @@
 package ru.skypro.homework.mapping;
 
 import org.springframework.stereotype.Component;
+import ru.skypro.homework.dto.announce.AnnouncesDtoOut;
+import ru.skypro.homework.dto.comment.CommentDto;
+import ru.skypro.homework.dto.comment.CommentsDto;
 import ru.skypro.homework.entity.Announce;
 import ru.skypro.homework.dto.announce.AnnounceDtoIn;
 import ru.skypro.homework.dto.announce.AnnounceDtoOut;
+import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.NotFoundUserException;
 import ru.skypro.homework.repository.UserRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class AnnounceMapper {
@@ -34,5 +41,19 @@ public class AnnounceMapper {
         announce.setPrice(announceDtoIn.getPrice());
         announce.setTitle(announceDtoIn.getTitle());
         return announce;
+    }
+
+    /**
+     * A method that converts a collection of the Announce class to a collection of the AnnounceDtoOut class.
+     */
+    public AnnouncesDtoOut AnnounceListToAnnounceDtoOutList(List<Announce> announces) {
+        var announcesDtoOut = new AnnouncesDtoOut();
+        announcesDtoOut.setCount(announces.size());
+
+        var announceDtoOutList = announces
+                .stream()
+                .map(this::toDTO).collect(Collectors.toList());
+        announcesDtoOut.setResults(announceDtoOutList);
+        return announcesDtoOut;
     }
 }

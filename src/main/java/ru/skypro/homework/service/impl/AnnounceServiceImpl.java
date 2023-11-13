@@ -3,6 +3,7 @@ package ru.skypro.homework.service.impl;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.dto.announce.AnnouncesDtoOut;
 import ru.skypro.homework.dto.announce.CreateOrUpdateAd;
 import ru.skypro.homework.entity.Announce;
 import ru.skypro.homework.dto.announce.AnnounceDtoIn;
@@ -39,10 +40,8 @@ public class AnnounceServiceImpl implements AnnounceService {
      * the method returns all announces
      */
     @Override
-    public List<AnnounceDtoOut> getAll() {
-        return announceRepository.findAll().stream()
-                .map(announceMapper::toDTO)
-                .collect(Collectors.toList());
+    public AnnouncesDtoOut getAll() {
+        return announceMapper.AnnounceListToAnnounceDtoOutList(announceRepository.findAll());
     }
 
     /**
