@@ -11,10 +11,10 @@ import java.util.List;
 
 public interface AnnounceService {
     AnnouncesDtoOut getAll();
-    List<AnnounceDtoOut> getAllOfUser(String email);
+    AnnouncesDtoOut getAllOfUser(String email);
     AnnounceDtoIn get(Integer id);
     AnnounceDtoOut add(CreateOrUpdateAd properties, MultipartFile image, String email) throws IOException;
-    AnnounceDtoOut updateInfo(Integer id, CreateOrUpdateAd property);
-    void updateImage(Integer id, MultipartFile image) throws IOException;
-    void delete(Integer id);
+    AnnounceDtoOut updateInfo(Integer id, CreateOrUpdateAd property, String email);
+    boolean updateImage(Integer id, MultipartFile image, String email) throws IOException;
+    boolean delete(Integer id, String email);
 }

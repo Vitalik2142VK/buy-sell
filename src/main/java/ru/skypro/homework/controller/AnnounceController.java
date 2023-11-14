@@ -17,6 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.announce.AnnounceDtoOut;
 import ru.skypro.homework.dto.announce.CreateOrUpdateAd;
 import ru.skypro.homework.entity.Announce;
+import ru.skypro.homework.exception.ForbiddenStatusException;
+import ru.skypro.homework.exception.NotFoundAnnounceException;
+import ru.skypro.homework.exception.NotFoundUserException;
 import ru.skypro.homework.service.AnnounceService;
 
 import java.io.IOException;
@@ -57,10 +60,7 @@ public class AnnounceController {
     })
     @GetMapping("me")
     public ResponseEntity<?> getAllOfUser(@AuthenticationPrincipal UserDetails userDetails) {
-        List<AnnounceDtoOut> results = announceService.getAllOfUser(userDetails.getUsername());
-        long count = results.size();
-        //TODO заменить на DTO
-        return ResponseEntity.status(HttpStatus.OK).body(Pair.of(count, results));
+        return ResponseEntity.status(HttpStatus.OK).body(announceService.getAllOfUser(userDetails.getUsername()));
     }
 
     @Operation(summary = "Добавление объявления")
@@ -76,11 +76,10 @@ public class AnnounceController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> add(@RequestPart CreateOrUpdateAd properties,
                                  @RequestPart MultipartFile image,
-                                 @AuthenticationPrincipal UserDetails userDetails) {
+                                 @AuthenticationPrincipal UserDetails userDetails) throws IOException {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(announceService.add(properties, image, userDetails.getUsername()));
-        } catch (IOException e) {
-            //TODO добавить лог
+        } catch (NotFoundUserException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
@@ -100,7 +99,13 @@ public class AnnounceController {
     })
     @GetMapping("{id}")
     public ResponseEntity<?> get(@PathVariable Integer id) {
-        return ResponseEntity.status(HttpStatus.OK).body(announceService.get(id));
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(announceService.get(id));
+        } catch (NotFoundUserException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (NotFoundAnnounceException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @Operation(summary = "Удаление объявления")
@@ -119,9 +124,18 @@ public class AnnounceController {
                     })
     })
     @DeleteMapping("{id}")
-    public ResponseEntity<?> delete(@PathVariable Integer id) {
-        announceService.delete(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    public ResponseEntity<?> delete(@PathVariable Integer id,
+                                    @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            if (announceService.delete(id, userDetails.getUsername())) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            }
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (NotFoundUserException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (NotFoundAnnounceException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @Operation(summary = "Обновление информации об объявлении")
@@ -142,8 +156,17 @@ public class AnnounceController {
     })
     @PatchMapping("{id}")
     public ResponseEntity<?> updateInfo(@PathVariable Integer id,
-                                        @RequestBody CreateOrUpdateAd property) {
-        return ResponseEntity.status(HttpStatus.OK).body(announceService.updateInfo(id, property));
+                                        @RequestBody CreateOrUpdateAd property,
+                                        @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(announceService.updateInfo(id, property, userDetails.getUsername()));
+        } catch (NotFoundUserException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (NotFoundAnnounceException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (ForbiddenStatusException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
     @Operation(summary = "Обновление картинки объявления")
@@ -164,13 +187,17 @@ public class AnnounceController {
     })
     @PatchMapping(value = "{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateImage(@PathVariable Integer id,
-                                         @RequestPart MultipartFile image) {
+                                         @RequestPart MultipartFile image,
+                                         @AuthenticationPrincipal UserDetails userDetails) throws IOException {
         try {
-            announceService.updateImage(id, image);
-            return ResponseEntity.status(HttpStatus.OK).body("string");
-        } catch (IOException e) {
-            //TODO добавить лог
+            if (announceService.updateImage(id, image, userDetails.getUsername())) {
+                return ResponseEntity.status(HttpStatus.OK).body("string");
+            }
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (NotFoundUserException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (NotFoundAnnounceException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

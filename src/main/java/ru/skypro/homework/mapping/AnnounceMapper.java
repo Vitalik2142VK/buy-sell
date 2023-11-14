@@ -46,7 +46,7 @@ public class AnnounceMapper {
     /**
      * A method that converts a collection of the Announce class to a collection of the AnnounceDtoOut class.
      */
-    public AnnouncesDtoOut AnnounceListToAnnounceDtoOutList(List<Announce> announces) {
+    public AnnouncesDtoOut announceListToAnnounceDtoOutList(List<Announce> announces) {
         var announcesDtoOut = new AnnouncesDtoOut();
         announcesDtoOut.setCount(announces.size());
 

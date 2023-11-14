@@ -9,6 +9,7 @@ import ru.skypro.homework.entity.Announce;
 import ru.skypro.homework.dto.announce.AnnounceDtoIn;
 import ru.skypro.homework.dto.announce.AnnounceDtoOut;
 import ru.skypro.homework.entity.User;
+import ru.skypro.homework.exception.ForbiddenStatusException;
 import ru.skypro.homework.exception.NotFoundAnnounceException;
 import ru.skypro.homework.exception.NotFoundUserException;
 import ru.skypro.homework.mapping.AnnounceMapper;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -41,7 +43,7 @@ public class AnnounceServiceImpl implements AnnounceService {
      */
     @Override
     public AnnouncesDtoOut getAll() {
-        return announceMapper.AnnounceListToAnnounceDtoOutList(announceRepository.findAll());
+        return announceMapper.announceListToAnnounceDtoOutList(announceRepository.findAll());
     }
 
     /**
@@ -50,11 +52,9 @@ public class AnnounceServiceImpl implements AnnounceService {
      */
 
     @Override
-    public List<AnnounceDtoOut> getAllOfUser(String email) {
+    public AnnouncesDtoOut getAllOfUser(String email) {
         var userPk = userRepository.findFirstByEmail(email).orElseThrow(NotFoundUserException::new).getId();
-        return announceRepository.findAllById(userPk).stream()
-                .map(announceMapper::toDTO)
-                .collect(Collectors.toList());
+        return announceMapper.announceListToAnnounceDtoOutList(announceRepository.findAllById(userPk));
     }
 
     /**
@@ -103,9 +103,13 @@ public class AnnounceServiceImpl implements AnnounceService {
 
     @PreAuthorize("hasRole('ADMIN') or @announceServiceImpl.checkAuthor(principal, #announceId)")
     @Override
-    public AnnounceDtoOut updateInfo(Integer id, CreateOrUpdateAd property) {
-        Announce announce = announceRepository.findById(id)
-                .orElseThrow(NotFoundAnnounceException::new);
+    public AnnounceDtoOut updateInfo(Integer id, CreateOrUpdateAd property, String email) {
+        var user = userRepository.findFirstByEmail(email).orElseThrow(NotFoundUserException::new);
+        var announce = announceRepository.findById(id).orElseThrow(NotFoundAnnounceException::new);
+
+        if (Objects.equals(announce.getAuthor(), user)) {
+            throw new ForbiddenStatusException();
+        }
 
         announce.setDescription(property.getDescription());
         announce.setTitle(announce.getTitle());
@@ -119,10 +123,14 @@ public class AnnounceServiceImpl implements AnnounceService {
      */
     @PreAuthorize("hasRole('ADMIN') or @announceServiceImpl.checkAuthor(principal, #announceId)")
     @Override
-    public void updateImage(Integer id, MultipartFile image) throws IOException {
-        Announce announce = announceRepository.findById(id)
-                .orElseThrow(NotFoundAnnounceException::new);
-        announce.setImage(Arrays.toString(image.getBytes()));
+    public boolean updateImage(Integer id, MultipartFile image, String email) throws IOException {
+        var user = userRepository.findFirstByEmail(email).orElseThrow(NotFoundUserException::new);
+        var announce = announceRepository.findById(id).orElseThrow(NotFoundAnnounceException::new);
+        if (Objects.equals(announce.getAuthor(), user)) {
+            announce.setImage(Arrays.toString(image.getBytes()));
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -131,10 +139,14 @@ public class AnnounceServiceImpl implements AnnounceService {
      */
     @PreAuthorize("hasRole('ADMIN') or @announceServiceImpl.checkAuthor(principal, #announceId)")
     @Override
-    public void delete(Integer id) {
-        announceRepository.delete(
-                announceRepository.findById(id).orElseThrow(RuntimeException::new)
-        );
+    public boolean delete(Integer id, String email) {
+        var user = userRepository.findFirstByEmail(email).orElseThrow(NotFoundUserException::new);
+        var announce = announceRepository.findById(id).orElseThrow(NotFoundAnnounceException::new);
+        if (Objects.equals(announce.getAuthor(), user)) {
+            announceRepository.delete(announce);
+            return true;
+        }
+        return false;
     }
 
     /**
