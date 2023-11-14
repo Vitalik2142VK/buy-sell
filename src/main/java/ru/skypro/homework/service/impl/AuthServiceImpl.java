@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.component.UserAuthDetailsService;
 import ru.skypro.homework.controller.UserController;
