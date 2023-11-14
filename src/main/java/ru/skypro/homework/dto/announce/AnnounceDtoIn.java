@@ -2,10 +2,12 @@ package ru.skypro.homework.dto.announce;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
-public class AnnounceDto {
+@ToString
+public class AnnounceDtoIn {
     private int pk;
     private String authorFirstName;
     private String authorLastName;
