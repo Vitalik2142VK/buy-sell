@@ -2,13 +2,12 @@ package ru.skypro.homework.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.component.UserAuthDetailsService;
-import ru.skypro.homework.controller.UserController;
 import ru.skypro.homework.dto.Register;
+import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.UserExistException;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.AuthService;
@@ -16,7 +15,7 @@ import ru.skypro.homework.service.AuthService;
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthServiceImpl.class);
 
     private final UserAuthDetailsService detailsService;
     private final PasswordEncoder encoder;
@@ -38,20 +37,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean register(Register register) {
-        ru.skypro.homework.entity.User user = userRepository.findFirstByEmail(register.getUsername()).orElse(null);
+        User user = userRepository.findFirstByEmail(register.getUsername()).orElse(null);
         if (user != null) {
             throw new UserExistException();
         }
-        UserDetails userDetails = User.builder()
-                .passwordEncoder(this.encoder::encode)
-                .password(register.getPassword())
-                .username(register.getUsername())
-                .roles(register.getRole().name())
-                .build();
-
-        user = new ru.skypro.homework.entity.User();
-        user.setEmail(userDetails.getUsername());
-        user.setPassword(userDetails.getPassword());
+        user = new User();
+        user.setEmail(register.getUsername());
+        user.setPassword(encoder.encode(register.getPassword()));
         user.setFirstName(register.getFirstName());
         user.setLastName(register.getLastName());
         user.setPhone(register.getPhone());

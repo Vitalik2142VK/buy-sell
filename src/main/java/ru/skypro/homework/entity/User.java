@@ -6,11 +6,11 @@ import lombok.Setter;
 import ru.skypro.homework.dto.Role;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "users")
 public class User {
     @Id
@@ -27,4 +27,22 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
     private String image;
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        User user = (User) object;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "User_"+ id + "_lg_" + email.hashCode();
+    }
 }

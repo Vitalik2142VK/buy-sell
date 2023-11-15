@@ -66,38 +66,31 @@ class CommentControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-//    @Autowired
-//    private ObjectMapper objectMapper;
-
-////
-//    @LocalServerPort
-//    private int port;
-
     @MockBean
     private CommentRepository commentRepository;
     @MockBean
     private UserRepository userRepository;
     @MockBean
-    private UserServiceImpl userService;
-    @MockBean
-    private AuthController authController;
-    @MockBean
-    private AuthServiceImpl authService;
-    @MockBean
     private AnnounceRepository announceRepository;
+
+    @Autowired
+    private UserServiceImpl userService;
+    @Autowired
+    private AuthController authController;
+    @Autowired
+    private AuthServiceImpl authService;
     @MockBean
     private AnnounceServiceImpl announceService;
     @MockBean
     private CommentServiceImpl commentService;
-    @MockBean
-    Register register;
-    @MockBean
-    Login login;
+    @Autowired
+    private Register register;
+    @Autowired
+    private Login login;
 //    @MockBean
 //    WebSecurityConfig config;
 //
 
-    @InjectMocks
     private CommentController commentController;
 
 

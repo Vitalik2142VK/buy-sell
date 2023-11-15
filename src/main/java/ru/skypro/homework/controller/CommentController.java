@@ -11,16 +11,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.dto.comment.CommentDto;
 import ru.skypro.homework.dto.comment.CommentsDto;
 import ru.skypro.homework.dto.comment.CreateOrUpdateCommentDto;
-import ru.skypro.homework.exception.CommentNotFoundException;
+import ru.skypro.homework.exception.NotFoundAnnounceException;
+import ru.skypro.homework.exception.NotFoundCommentException;
 import ru.skypro.homework.exception.NotFoundUserException;
-import ru.skypro.homework.exception.UserExistException;
 import ru.skypro.homework.exception.UserNotAuthorCommentException;
 import ru.skypro.homework.service.CommentService;
 
@@ -53,9 +52,9 @@ public class CommentController {
                                                          @Parameter(description = "id объявления") Integer id) {
         try {
             return ResponseEntity.ok(commentService.findAllAdComments(id));
-        } catch (CommentNotFoundException e) {
+        } catch (NotFoundUserException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        } catch (RuntimeException e) { //TODO Заменить на exception отсутствия объявления
+        } catch (NotFoundAnnounceException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
@@ -78,12 +77,12 @@ public class CommentController {
                                                     @Parameter(description = "id объявления") Integer id,
                                                     @RequestBody
                                                     @Valid CreateOrUpdateCommentDto createOrUpdateCommentDto,
-                                                    @AuthenticationPrincipal UserDetails userDetails) {
+                                                    @AuthenticationPrincipal UserAuth userDetails) {
         try {
             return ResponseEntity.ok(commentService.createComment(id, createOrUpdateCommentDto, userDetails));
-        } catch (CommentNotFoundException e) {
+        } catch (NotFoundCommentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        } catch (RuntimeException e) { //TODO Заменить на exception отсутствия объявления
+        } catch (NotFoundAnnounceException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
@@ -109,12 +108,13 @@ public class CommentController {
                                              @PathVariable
                                              @Parameter(description = "id комментария") Integer commentId) {
         try {
-            return ResponseEntity.ok(commentService.deleteAdComment(adId, commentId));
+            commentService.deleteAdComment(adId, commentId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (NotFoundUserException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (UserNotAuthorCommentException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        } catch (RuntimeException e) { //TODO Заменить на exception отсутствия объявления
+        } catch (NotFoundCommentException | NotFoundAnnounceException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
@@ -148,7 +148,7 @@ public class CommentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (UserNotAuthorCommentException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        } catch (RuntimeException e) { //TODO Заменить на exception отсутствия объявления
+        } catch (NotFoundCommentException | NotFoundAnnounceException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }

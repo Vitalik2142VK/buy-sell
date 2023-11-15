@@ -11,3 +11,5 @@ CREATE TABLE announces(
     CONSTRAINT announce_pkey PRIMARY KEY (id)
 );
 
+-- changeset vKvs: changed_length_string_image
+ALTER TABLE announces ALTER COLUMN image TYPE VARCHAR(128);

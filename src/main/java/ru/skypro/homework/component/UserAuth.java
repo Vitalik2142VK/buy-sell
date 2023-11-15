@@ -6,6 +6,7 @@ import ru.skypro.homework.entity.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 public class UserAuth implements UserDetails{
     private final User user;
@@ -49,7 +50,7 @@ public class UserAuth implements UserDetails{
         return true;
     }
 
-    public User getUser() {
-        return user;
+    public Optional<User> getUser() {
+        return Optional.ofNullable(user);
     }
 }

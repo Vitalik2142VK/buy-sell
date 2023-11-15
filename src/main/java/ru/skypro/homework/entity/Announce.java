@@ -5,11 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "announces")
 public class Announce {
     @Id
@@ -25,4 +25,17 @@ public class Announce {
     private String image;
     private int price;
     private String title;
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Announce announce = (Announce) object;
+        return Objects.equals(id, announce.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

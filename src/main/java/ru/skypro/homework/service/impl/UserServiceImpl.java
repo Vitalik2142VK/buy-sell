@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.dto.user.NewPasswordUser;
 import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.dto.user.UserDto;
@@ -38,8 +39,8 @@ public class UserServiceImpl implements UserService {
     * Change the user's password.
     */
     @Override
-    public boolean changePassword(NewPasswordUser newPassword, UserDetails userDetails) {
-        User user = userRepository.findFirstByEmail(userDetails.getUsername()).orElseThrow(NotFoundUserException::new);
+    public boolean changePassword(NewPasswordUser newPassword, UserAuth userDetails) {
+        User user = userDetails.getUser().orElseThrow(NotFoundUserException::new);
         if (encoder.matches(newPassword.getCurrentPassword(), userDetails.getPassword())) {
             UserDetails updateUserDetails = org.springframework.security.core.userdetails.User.builder()
                     .passwordEncoder(this.encoder::encode)
@@ -59,8 +60,8 @@ public class UserServiceImpl implements UserService {
      * Provides data about the current user.
      */
     @Override
-    public UserDto getUserDto(UserDetails userDetails) {
-        User user = userRepository.findFirstByEmail(userDetails.getUsername()).orElseThrow(NotFoundUserException::new);
+    public UserDto getUserDto(UserAuth userDetails) {
+        User user = userDetails.getUser().orElseThrow(NotFoundUserException::new);
         return userMapper.mapToUserDto(user);
     }
 
@@ -68,10 +69,10 @@ public class UserServiceImpl implements UserService {
      * Change data about the current user.
      */
     @Override
-    public UserChangeDto putUser(UserChangeDto userChange, UserDetails userDetails) {
+    public UserChangeDto putUser(UserChangeDto userChange, UserAuth userDetails) {
         User user = userMapper.mapToUserForUserChangeDto(
                 userChange,
-                userRepository.findFirstByEmail(userDetails.getUsername()).orElseThrow(NotFoundUserException::new));
+                userDetails.getUser().orElseThrow(NotFoundUserException::new));
         userRepository.save(user);
         return userChange;
     }
@@ -80,8 +81,8 @@ public class UserServiceImpl implements UserService {
      * Update the user's image.
      */
     @Override
-    public void putUserImage(MultipartFile image, UserDetails userDetails) throws IOException {
-        User user = userRepository.findFirstByEmail(userDetails.getUsername()).orElseThrow(NotFoundUserException::new);
+    public void putUserImage(MultipartFile image, UserAuth userDetails) throws IOException {
+        User user = userDetails.getUser().orElseThrow(NotFoundUserException::new);
         if (user.getImage() == null || user.getImage().isEmpty()) {
             user.setImage(WorkWithImage.saveAndGetStringImage(imagePath, user.toString(), image));
         } else {

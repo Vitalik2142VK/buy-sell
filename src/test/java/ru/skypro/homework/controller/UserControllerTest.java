@@ -20,6 +20,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.component.UserAuthDetailsService;
 import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.user.UserDto;
@@ -90,7 +91,7 @@ public class UserControllerTest {
                 .apply(springSecurity())
                 .build();
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername("petrov@gmail.com");
+        UserAuth userDetails = (UserAuth) userDetailsService.loadUserByUsername("petrov@gmail.com");
         UserDto dto = userService.getUserDto(userDetails);
 
         mockMvc.perform(

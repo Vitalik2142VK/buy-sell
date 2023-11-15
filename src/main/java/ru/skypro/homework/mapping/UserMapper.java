@@ -16,7 +16,11 @@ public class UserMapper {
         dto.setLastName(user.getLastName());
         dto.setPhone(user.getPhone());
         dto.setRole(user.getRole());
-        dto.setImage("/users/" + user.getImage());
+        if (user.getImage() == null || user.getImage().isEmpty()) {
+            dto.setImage(null);
+        } else {
+            dto.setImage("/users/" + user.getImage());
+        }
         return dto;
     }
 

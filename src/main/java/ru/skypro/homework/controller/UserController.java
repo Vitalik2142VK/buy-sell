@@ -13,9 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.dto.user.NewPasswordUser;
 import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.dto.user.UserDto;
@@ -56,7 +56,7 @@ public class UserController {
     })
     @PostMapping("/set_password")
     public ResponseEntity<?> setPassword(@RequestBody NewPasswordUser newPassword,
-                                         @AuthenticationPrincipal UserDetails userDetails) {
+                                         @AuthenticationPrincipal UserAuth userDetails) {
         try {
             if (userService.changePassword(newPassword, userDetails)) {
                 return ResponseEntity.ok().build();
@@ -79,7 +79,7 @@ public class UserController {
                     })
     })
     @GetMapping("/me")
-    public ResponseEntity<?> getUser(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> getUser(@AuthenticationPrincipal UserAuth userDetails) {
         try {
             return ResponseEntity.ok(userService.getUserDto(userDetails));
         } catch (NotFoundUserException e) {
@@ -99,7 +99,7 @@ public class UserController {
     })
     @PatchMapping("/me")
     public ResponseEntity<?> putUser(@RequestBody UserChangeDto userChange,
-                                     @AuthenticationPrincipal UserDetails userDetails) {
+                                     @AuthenticationPrincipal UserAuth userDetails) {
         try {
             return ResponseEntity.ok(userService.putUser(userChange, userDetails));
         } catch (NotFoundUserException e) {
@@ -118,7 +118,7 @@ public class UserController {
     })
     @PatchMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> putUserImage(@RequestParam MultipartFile image,
-                                          @AuthenticationPrincipal UserDetails userDetails) {
+                                          @AuthenticationPrincipal UserAuth userDetails) {
         try {
             userService.putUserImage(image, userDetails);
             return ResponseEntity.ok().build();
