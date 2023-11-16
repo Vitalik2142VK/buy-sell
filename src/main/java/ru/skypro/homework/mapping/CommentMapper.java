@@ -42,7 +42,7 @@ public class CommentMapper {
     /**
      * A method that converts a collection of the Comment class to a collection of the CommentsDto class.
      */
-    public CommentsDto сommentListToCommentDtoList(List<Comment> comments) {
+    public CommentsDto commentListToCommentDtoList(List<Comment> comments) {
         CommentsDto dto = new CommentsDto();
         dto.setCount(comments.size());
         List<CommentDto> commentDtoList = comments

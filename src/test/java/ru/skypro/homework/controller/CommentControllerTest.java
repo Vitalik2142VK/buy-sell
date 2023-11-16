@@ -76,8 +76,6 @@ class CommentControllerTest {
     @Autowired
     private UserServiceImpl userService;
     @Autowired
-    private AuthController authController;
-    @Autowired
     private AuthServiceImpl authService;
     @MockBean
     private AnnounceServiceImpl announceService;

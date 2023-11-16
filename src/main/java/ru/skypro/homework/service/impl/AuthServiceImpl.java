@@ -37,11 +37,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean register(Register register) {
-        User user = userRepository.findFirstByEmail(register.getUsername()).orElse(null);
-        if (user != null) {
-            throw new UserExistException();
-        }
-        user = new User();
+        userRepository.checkUserByEmail(register.getUsername()).orElseThrow(UserExistException::new);
+        User user = new User();
         user.setEmail(register.getUsername());
         user.setPassword(encoder.encode(register.getPassword()));
         user.setFirstName(register.getFirstName());

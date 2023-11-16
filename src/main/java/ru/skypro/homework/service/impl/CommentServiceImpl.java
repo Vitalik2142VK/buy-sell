@@ -40,12 +40,11 @@ public class CommentServiceImpl implements CommentService {
      * The method searches for and returns a list of all comments to the ad by the ad id
      */
     @Override
-    @PreAuthorize("@commentServiceImpl.checkUserAuthorization(principal)")
     public CommentsDto findAllAdComments(Integer adId) {
         announceRepository.checkExistAnnounce(adId).orElseThrow(NotFoundAnnounceException::new);
 
         List<Comment> listComments = commentRepository.findAllByAd_IdOrderByCreatedAtDesc(adId);
-        return commentMapper.сommentListToCommentDtoList(listComments);
+        return commentMapper.commentListToCommentDtoList(listComments);
     }
 
     /**
@@ -66,8 +65,9 @@ public class CommentServiceImpl implements CommentService {
      * The method deletes the comment to the ad by the ad id and comment id
      */
     @Override
-    @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.checkAuthor(principal, #commentId, #adId)")
+    @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.checkAuthor(principal, #commentId)")
     public void deleteAdComment(Integer adId, Integer commentId) {
+        announceRepository.checkExistAnnounce(adId).orElseThrow(NotFoundAnnounceException::new);
         if (adId == null || commentId == null) {
             throw new IllegalArgumentException("adId or commentId variables must not be null!");
         }
@@ -79,9 +79,10 @@ public class CommentServiceImpl implements CommentService {
      * The method update the comment to the ad by the ad id and comment id
      */
     @Override
-    @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.checkAuthor(principal, #commentId, #adId)")
+    @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.checkAuthor(principal, #commentId)")
     public CommentDto updateComment(Integer adId, Integer commentId,
                                     CreateOrUpdateCommentDto createOrUpdateCommentDto) {
+        announceRepository.checkExistAnnounce(adId).orElseThrow(NotFoundAnnounceException::new);
         Comment comment = commentRepository.findById(commentId).orElseThrow(NotFoundCommentException::new);
         comment.setText(createOrUpdateCommentDto.getText());
         commentRepository.save(comment);
@@ -91,19 +92,8 @@ public class CommentServiceImpl implements CommentService {
     /**
      * The method checks the author of the ad
      */
-    public boolean checkAuthor(Principal principal, int commentId, int adId) {
-        if (!announceRepository.checkExistAnnounce(adId).orElseThrow(NotFoundAnnounceException::new)) {
-            return false;
-        }
+    public boolean checkAuthor(Principal principal, int commentId) {
         int idUser = userRepository.getIdUserByEmail(principal.getName()).orElseThrow(NotFoundUserException::new);
         return commentRepository.checkAuthorComment(commentId, idUser).orElseThrow(UserNotAuthorCommentException::new);
     }
-
-    /**
-     * The method checking user authorization
-     */
-    public boolean checkUserAuthorization(Principal principal) {
-        return userRepository.checkUserByEmail(principal.getName()).orElseThrow(NotFoundUserException::new);
-    }
-
 }
