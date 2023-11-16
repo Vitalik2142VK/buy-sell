@@ -7,6 +7,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,7 @@ import ru.skypro.homework.exception.ForbiddenStatusException;
 import ru.skypro.homework.exception.NotFoundAnnounceException;
 import ru.skypro.homework.exception.NotFoundUserException;
 import ru.skypro.homework.exception.UserNotAuthorAnnounceException;
+import ru.skypro.homework.helper.WorkWithImage;
 import ru.skypro.homework.service.AnnounceService;
 
 import java.io.IOException;
@@ -29,10 +33,15 @@ import java.util.List;
 
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
-@RequestMapping("/ads")
+@RequestMapping("/${announce.url}")
 @Tag(name = "Объявления")
 public class AnnounceController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnnounceController.class);
+
     private final AnnounceService announceService;
+
+    @Value("${announce.image}")
+    private String path;
 
     public AnnounceController(AnnounceService announceService) {
         this.announceService = announceService;
@@ -197,6 +206,16 @@ public class AnnounceController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (NotFoundAnnounceException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("/${announce.image}/{image_path}")
+    public ResponseEntity<?> getImage(@PathVariable("image_path") String imagePath) {
+        try {
+            return ResponseEntity.ok(WorkWithImage.loadImage(path + '\\' + imagePath));
+        } catch (IOException e) {
+            LOGGER.error("Error writing file to output stream. Exception: '" + e.getMessage() + "'", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

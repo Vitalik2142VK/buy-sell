@@ -1,6 +1,5 @@
 package ru.skypro.homework.service.impl;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,7 +12,7 @@ import ru.skypro.homework.dto.user.UserDto;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.NotFoundUserException;
 import ru.skypro.homework.mapping.UserMapper;
-import ru.skypro.homework.model.WorkWithImage;
+import ru.skypro.homework.helper.WorkWithImage;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.UserService;
 
@@ -28,6 +27,8 @@ public class UserServiceImpl implements UserService {
 
     @Value("${user.image}")
     private String imagePath;
+    @Value("${user.url}")
+    private String userUrl;
 
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder encoder) {
         this.userRepository = userRepository;
@@ -84,9 +85,9 @@ public class UserServiceImpl implements UserService {
     public void putUserImage(MultipartFile image, UserAuth userDetails) throws IOException {
         User user = userDetails.getUser().orElseThrow(NotFoundUserException::new);
         if (user.getImage() == null || user.getImage().isEmpty()) {
-            user.setImage(WorkWithImage.saveAndGetStringImage(imagePath, user.toString(), image));
+            user.setImage(WorkWithImage.saveAndGetStringImage(userUrl, imagePath, user.toString(), image));
         } else {
-            user.setImage(WorkWithImage.updateAndGetStringImage(imagePath, user.getImage(), image));
+            user.setImage(WorkWithImage.updateAndGetStringImage(userUrl, imagePath, user.getImage(), image));
         }
         userRepository.save(user);
     }

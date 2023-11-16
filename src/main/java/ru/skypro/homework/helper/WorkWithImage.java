@@ -1,4 +1,4 @@
-package ru.skypro.homework.model;
+package ru.skypro.homework.helper;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,24 +13,24 @@ public class WorkWithImage {
     /**
      * Save the new image.
      */
-    public static String saveAndGetStringImage(String directory, String name, MultipartFile image) throws IOException {
+    public static String saveAndGetStringImage(String url, String directory, String name, MultipartFile image) throws IOException {
         Path filePath = Path.of(directory, name + "." + getExtensions(image.getOriginalFilename()));
         Files.createDirectories(filePath.getParent());
         Files.deleteIfExists(filePath);
         Files.write(filePath, image.getBytes());
-        return filePath.toString();
+        return '/' + url + '/' + directory + '/' + filePath.toFile().getName();
     }
 
     /**
      * Update the image.
      */
-    public static String updateAndGetStringImage(String directory, String oldImage, MultipartFile image) throws IOException {
+    public static String updateAndGetStringImage(String url, String directory, String oldImage, MultipartFile image) throws IOException {
         String name = oldImage.substring(oldImage.lastIndexOf('\\') + 1, oldImage.lastIndexOf('.'));
 
         Path pathOld = Path.of(oldImage);
         Files.deleteIfExists(pathOld);
 
-        return saveAndGetStringImage(directory, name, image);
+        return saveAndGetStringImage(url, directory, name, image);
     }
 
     /**
