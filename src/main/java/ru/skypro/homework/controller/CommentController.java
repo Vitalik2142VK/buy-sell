@@ -8,14 +8,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.dto.comment.CommentDto;
 import ru.skypro.homework.dto.comment.CommentsDto;
 import ru.skypro.homework.dto.comment.CreateOrUpdateCommentDto;
+import ru.skypro.homework.exception.NotFoundAnnounceException;
+import ru.skypro.homework.exception.NotFoundCommentException;
+import ru.skypro.homework.exception.NotFoundUserException;
+import ru.skypro.homework.exception.UserNotAuthorCommentException;
 import ru.skypro.homework.service.CommentService;
 
 import javax.validation.Valid;
@@ -45,7 +50,13 @@ public class CommentController {
     @GetMapping("/{id}/comments")
     public ResponseEntity<CommentsDto> findAllAdComments(@PathVariable
                                                          @Parameter(description = "id объявления") Integer id) {
-        return ResponseEntity.ok(commentService.findAllAdComments(id));
+        try {
+            return ResponseEntity.ok(commentService.findAllAdComments(id));
+        } catch (NotFoundUserException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (NotFoundAnnounceException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @Operation(summary = "Добавление комментария к объявлению")
@@ -66,8 +77,14 @@ public class CommentController {
                                                     @Parameter(description = "id объявления") Integer id,
                                                     @RequestBody
                                                     @Valid CreateOrUpdateCommentDto createOrUpdateCommentDto,
-                                                    @AuthenticationPrincipal Authentication authentication) {
-        return ResponseEntity.ok(commentService.createComment(id, createOrUpdateCommentDto, authentication));
+                                                    @AuthenticationPrincipal UserAuth userDetails) {
+        try {
+            return ResponseEntity.ok(commentService.createComment(id, createOrUpdateCommentDto, userDetails));
+        } catch (NotFoundCommentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (NotFoundAnnounceException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @Operation(summary = "Удаление комментария")
@@ -89,9 +106,17 @@ public class CommentController {
     public ResponseEntity<?> deleteAdComment(@PathVariable
                                              @Parameter(description = "id объявления") Integer adId,
                                              @PathVariable
-                                             @Parameter(description = "id комментария") Integer commentId,
-                                             @AuthenticationPrincipal Authentication authentication) {
-        return ResponseEntity.ok(commentService.deleteAdComment(adId, commentId, authentication));
+                                             @Parameter(description = "id комментария") Integer commentId) {
+        try {
+            commentService.deleteAdComment(adId, commentId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (NotFoundUserException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (UserNotAuthorCommentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (NotFoundCommentException | NotFoundAnnounceException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @Operation(summary = "Обновление комментария")
@@ -116,9 +141,16 @@ public class CommentController {
                                                     @PathVariable
                                                     @Parameter(description = "id комментария") Integer commentId,
                                                     @RequestBody
-                                                    @Valid CreateOrUpdateCommentDto createOrUpdateCommentDto,
-                                                    @AuthenticationPrincipal Authentication authentication) {
-        return ResponseEntity.ok(commentService.updateComment(adId, commentId, createOrUpdateCommentDto, authentication));
+                                                    @Valid CreateOrUpdateCommentDto createOrUpdateCommentDto) {
+        try {
+            return ResponseEntity.ok(commentService.updateComment(adId, commentId, createOrUpdateCommentDto));
+        } catch (NotFoundUserException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (UserNotAuthorCommentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (NotFoundCommentException | NotFoundAnnounceException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
 }

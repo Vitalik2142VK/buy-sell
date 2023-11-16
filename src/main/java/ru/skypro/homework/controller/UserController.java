@@ -6,14 +6,21 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.dto.user.NewPasswordUser;
 import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.dto.user.UserDto;
+import ru.skypro.homework.exception.NotFoundUserException;
+import ru.skypro.homework.model.WorkWithImage;
 import ru.skypro.homework.service.UserService;
 
 import java.io.IOException;
@@ -24,7 +31,12 @@ import java.io.IOException;
 @Tag(name = "Пользователи")
 public class UserController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+
     private final UserService userService;
+
+    @Value("${user.image}")
+    private String path;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -43,14 +55,15 @@ public class UserController {
                     })
     })
     @PostMapping("/set_password")
-    public ResponseEntity<?> setPassword(@RequestBody NewPasswordUser newPassword) {
-        if (userService.userLogged()) {
-            if (userService.changePassword(newPassword)) {
+    public ResponseEntity<?> setPassword(@RequestBody NewPasswordUser newPassword,
+                                         @AuthenticationPrincipal UserAuth userDetails) {
+        try {
+            if (userService.changePassword(newPassword, userDetails)) {
                 return ResponseEntity.ok().build();
             } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
-        } else {
+        } catch (NotFoundUserException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
@@ -66,10 +79,10 @@ public class UserController {
                     })
     })
     @GetMapping("/me")
-    public ResponseEntity<?> getUser() {
-        if (userService.userLogged()) {
-            return ResponseEntity.ok(userService.getUserDto());
-        } else {
+    public ResponseEntity<?> getUser(@AuthenticationPrincipal UserAuth userDetails) {
+        try {
+            return ResponseEntity.ok(userService.getUserDto(userDetails));
+        } catch (NotFoundUserException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
@@ -85,10 +98,11 @@ public class UserController {
                     })
     })
     @PatchMapping("/me")
-    public ResponseEntity<?> putUser(@RequestBody UserChangeDto userChange) {
-        if (userService.userLogged()) {
-            return ResponseEntity.ok(userService.putUser(userChange));
-        } else {
+    public ResponseEntity<?> putUser(@RequestBody UserChangeDto userChange,
+                                     @AuthenticationPrincipal UserAuth userDetails) {
+        try {
+            return ResponseEntity.ok(userService.putUser(userChange, userDetails));
+        } catch (NotFoundUserException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
@@ -103,16 +117,26 @@ public class UserController {
                     })
     })
     @PatchMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> putUserImage(@RequestParam MultipartFile image) {
-        if (userService.userLogged()) {
-            try {
-                userService.putUserImage(image);
-            } catch (IOException e) {
-                //TODO добавить лог
-            }
+    public ResponseEntity<?> putUserImage(@RequestParam MultipartFile image,
+                                          @AuthenticationPrincipal UserAuth userDetails) {
+        try {
+            userService.putUserImage(image, userDetails);
             return ResponseEntity.ok().build();
-        } else {
+        } catch (NotFoundUserException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (IOException e) {
+            LOGGER.error("Exception: '" + e.getMessage() + "'", e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    @GetMapping("/${user.image}/{image_path}")
+    public ResponseEntity<?> getImage(@PathVariable("image_path") String imagePath) {
+        try {
+            return ResponseEntity.ok(WorkWithImage.loadImage(path + '\\' + imagePath));
+        } catch (IOException e) {
+            LOGGER.error("Error writing file to output stream. Exception: '" + e.getMessage() + "'", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

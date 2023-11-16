@@ -1,6 +1,8 @@
 package ru.skypro.homework.service;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.dto.user.NewPasswordUser;
 import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.dto.user.UserDto;
@@ -9,13 +11,11 @@ import java.io.IOException;
 
 public interface UserService {
 
-    boolean userLogged();
+    boolean changePassword(NewPasswordUser newPassword, UserAuth userDetails);
 
-    boolean changePassword(NewPasswordUser newPassword);
+    UserDto getUserDto(UserAuth userDetails);
 
-    UserDto getUserDto();
+    UserChangeDto putUser(UserChangeDto userChange, UserAuth userDetails);
 
-    UserChangeDto putUser(UserChangeDto userChange);
-
-    void putUserImage(MultipartFile image) throws IOException;
+    void putUserImage(MultipartFile image, UserAuth userDetails) throws IOException;
 }
