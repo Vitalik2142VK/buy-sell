@@ -35,7 +35,7 @@ public class CommentMapper {
     public Comment mapToNewComment(CreateOrUpdateCommentDto commentDto) {
         Comment comment = new Comment();
         comment.setText(commentDto.getText());
-        comment.setCreatedAt(Instant.now().getEpochSecond());
+        comment.setCreatedAt(System.currentTimeMillis());
         return comment;
     }
 

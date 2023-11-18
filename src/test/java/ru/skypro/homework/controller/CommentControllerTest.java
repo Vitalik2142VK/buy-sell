@@ -16,13 +16,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.jaas.memory.InMemoryConfiguration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.skypro.homework.TestContainerPostgre;
+import ru.skypro.homework.component.UserAuthDetailsService;
 import ru.skypro.homework.config.WebSecurityConfig;
 import ru.skypro.homework.dto.Login;
 import ru.skypro.homework.dto.Register;
@@ -38,15 +44,18 @@ import ru.skypro.homework.mapping.UserMapper;
 import ru.skypro.homework.repository.AnnounceRepository;
 import ru.skypro.homework.repository.CommentRepository;
 import ru.skypro.homework.repository.UserRepository;
+import ru.skypro.homework.service.CommentService;
 import ru.skypro.homework.service.impl.AnnounceServiceImpl;
 import ru.skypro.homework.service.impl.AuthServiceImpl;
 import ru.skypro.homework.service.impl.CommentServiceImpl;
 import ru.skypro.homework.service.impl.UserServiceImpl;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -54,41 +63,25 @@ import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.skypro.homework.helper.HelperUser.*;
 
-@WebMvcTest
-@ExtendWith(MockitoExtension.class)
-@ContextConfiguration(classes = {WebSecurityConfig.class})
-@AutoConfigureMockWebServiceClient
-//@AutoConfigureMockMvc
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = InMemoryUserDetailsManager.class)
-class CommentControllerTest {
+class CommentControllerTest extends TestContainerPostgre {
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
     private CommentRepository commentRepository;
-    @MockBean
+    @Autowired
     private UserRepository userRepository;
-    @MockBean
+    @Autowired
     private AnnounceRepository announceRepository;
-
     @Autowired
-    private UserServiceImpl userService;
+    private CommentMapper commentMapper;
     @Autowired
-    private AuthServiceImpl authService;
-    @MockBean
-    private AnnounceServiceImpl announceService;
-    @MockBean
-    private CommentServiceImpl commentService;
+    private PasswordEncoder encoder;
     @Autowired
-    private Register register;
+    private UserAuthDetailsService userDetailsService;
     @Autowired
-    private Login login;
-//    @MockBean
-//    WebSecurityConfig config;
-//
-
+    private CommentService commentService;
+    @Autowired
     private CommentController commentController;
 
 
@@ -115,70 +108,47 @@ class CommentControllerTest {
 //    }
 
     @Test
+    @Transactional
     void findAllAdCommentsTest() throws Exception {
+        insertUsers(userRepository, encoder);
+        User author = userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow();
+        Announce ad = announceRepository.save(createAnnounce(
+                author,
+                "Описание объявления",
+                "null",
+                1000,
+                "Заголовок объявления"
+                ));
+        insertComment(commentRepository, ad, author);
 
-        String text = "Very good bicycle!";
-        int id = 3;
+        CommentsDto dto = commentService.findAllAdComments(ad.getId());
+        CommentDto answer = dto.getResults().get(0);
 
-        JSONObject commentObject = new JSONObject();
-        commentObject.put("text", text);
-
-        User user = new User();
-        User authorComment = new User();
-        Announce announce = new Announce();
-        Comment comment = new Comment();
-
-        user.setId(1);
-        user.setFirstName("Sergey");
-        user.setRole(Role.ADMIN);
-
-        authorComment.setId(11);
-        authorComment.setFirstName("Anonymous");
-        authorComment.setRole(Role.USER);
-
-        announce.setId(2);
-        announce.setAuthor(user);
-        announce.setTitle("Bicycle");
-        announce.setPrice(9999);
-
-        comment.setId(id);
-        comment.setAuthor(authorComment);
-        comment.setAd(announce);
-        comment.setText(text);
-
-        List<Comment> list = List.of(comment);
-        List<User> users = List.of(user, authorComment);
-
-
-
-//        Mockito.when(userRepository.findAll()).thenReturn(List.of(user, authorComment));
-        Mockito.when(announceRepository.findById(Math.toIntExact(any(Long.class)))).thenReturn(Optional.of(announce));
-        Mockito.when(commentRepository.save(any(Comment.class))).thenReturn(comment);
-        Mockito.when(commentRepository.findAllByAd_IdOrderByCreatedAtDesc(Math.toIntExact(any(Long.class)))).
-                thenReturn(list);
-
-        mockMvc.perform(MockMvcRequestBuilders
-                        .post("http://localhost:3000/ads/2/comments"))
-//        mockMvc.perform(get("/2/comments"))
-//                        .content(list.toString())
-//                        .content(commentObject.toString())
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()) //receive
-                .andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.text").value(text));
+        mockMvc.perform(
+                        get("/ads/" + ad.getId()+ "/comments")
+                                .header(HttpHeaders.AUTHORIZATION,"Basic " + HttpHeaders.encodeBasicAuth("ivanov@gmail.com", "12345678", StandardCharsets.UTF_8))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count").value(dto.getCount()))
+                .andExpect(jsonPath("$.results", hasSize(1)))
+                .andExpect(jsonPath("$.results[0].author").value(answer.getAuthor()))
+                .andExpect(jsonPath("$.results[0].authorImage").value(answer.getAuthorImage()))
+                .andExpect(jsonPath("$.results[0].authorFirstName").value(answer.getAuthorFirstName()))
+                .andExpect(jsonPath("$.results[0].createdAt").value(answer.getCreatedAt()))
+                .andExpect(jsonPath("$.results[0].pk").value(answer.getPk()))
+                .andExpect(jsonPath("$.results[0].text").value(answer.getText()));
 
     }
 
-    @Test
-    void createCommentTest() {
-    }
-
-    @Test
-    void deleteAdComment() {
-    }
-
-    @Test
-    void updateComment() {
-    }
+//    @Test
+//    void createCommentTest() {
+//    }
+//
+//    @Test
+//    void deleteAdComment() {
+//    }
+//
+//    @Test
+//    void updateComment() {
+//    }
 }
