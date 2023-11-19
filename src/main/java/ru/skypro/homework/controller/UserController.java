@@ -129,10 +129,10 @@ public class UserController {
         }
     }
 
-    @GetMapping("/${user.image}/{image_path}")
-    public ResponseEntity<?> getImage(@PathVariable("image_path") String imagePath) {
+    @GetMapping("/${user.image}/{image_name}")
+    public ResponseEntity<?> getImage(@PathVariable("image_name") String imageName) {
         try {
-            return ResponseEntity.ok(WorkWithImage.loadImage(path + '\\' + imagePath));
+            return ResponseEntity.ok(userService.getImage(imageName));
         } catch (IOException e) {
             LOGGER.error("Error writing file to output stream. Exception: '" + e.getMessage() + "'", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

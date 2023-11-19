@@ -146,6 +146,9 @@ public class AnnounceController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (NotFoundAnnounceException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (IOException e) {
+            LOGGER.error("Error writing file to output stream. Exception: '" + e.getMessage() + "'", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -209,10 +212,10 @@ public class AnnounceController {
         }
     }
 
-    @GetMapping("/${announce.image}/{image_path}")
-    public ResponseEntity<?> getImage(@PathVariable("image_path") String imagePath) {
+    @GetMapping("/${announce.image}/{name_image}")
+    public ResponseEntity<?> getImage(@PathVariable("name_image") String nameImage) {
         try {
-            return ResponseEntity.ok(WorkWithImage.loadImage(path + '\\' + imagePath));
+            return ResponseEntity.ok(announceService.getImage(nameImage));
         } catch (IOException e) {
             LOGGER.error("Error writing file to output stream. Exception: '" + e.getMessage() + "'", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

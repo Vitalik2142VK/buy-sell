@@ -13,24 +13,24 @@ public class WorkWithImage {
     /**
      * Save the new image.
      */
-    public static String saveAndGetStringImage(String url, String directory, String name, MultipartFile image) throws IOException {
+    public static String saveAndGetStringImage(String directory, String name, MultipartFile image) throws IOException {
         Path filePath = Path.of(directory, name + "." + getExtensions(image.getOriginalFilename()));
         Files.createDirectories(filePath.getParent());
         Files.deleteIfExists(filePath);
         Files.write(filePath, image.getBytes());
-        return '/' + url + '/' + directory + '/' + filePath.toFile().getName();
+        return filePath.toFile().getName();
     }
 
     /**
      * Update the image.
      */
-    public static String updateAndGetStringImage(String url, String directory, String oldImage, MultipartFile image) throws IOException {
-        String name = oldImage.substring(oldImage.lastIndexOf('\\') + 1, oldImage.lastIndexOf('.'));
+    public static String updateAndGetStringImage(String directory, String oldImage, MultipartFile image) throws IOException {
+        String name = oldImage.substring(0, oldImage.lastIndexOf('.'));
 
         Path pathOld = Path.of(oldImage);
         Files.deleteIfExists(pathOld);
 
-        return saveAndGetStringImage(url, directory, name, image);
+        return saveAndGetStringImage(directory, name, image);
     }
 
     /**
@@ -38,6 +38,14 @@ public class WorkWithImage {
      */
     public static byte[] loadImage(String imagePath) throws IOException {
         return  Files.readAllBytes(Paths.get(imagePath));
+    }
+
+    /**
+     * Load the image.
+     */
+    public static void removeImage(String imagePath) throws IOException {
+        Path pathOld = Path.of(imagePath);
+        Files.deleteIfExists(pathOld);
     }
 
     private static String getExtensions(String fileName) {

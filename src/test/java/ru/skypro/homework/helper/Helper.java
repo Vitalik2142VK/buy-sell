@@ -9,8 +9,8 @@ import ru.skypro.homework.repository.AnnounceRepository;
 import ru.skypro.homework.repository.CommentRepository;
 import ru.skypro.homework.repository.UserRepository;
 
-public class HelperUser {
-    private HelperUser() {}
+public class Helper {
+    private Helper() {}
 
     public static User createUser(String email, String password, String firstName, String lastName, String image, Role role, PasswordEncoder encoder) {
         User user = new User();

@@ -21,7 +21,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.skypro.homework.helper.HelperUser.*;
+import static ru.skypro.homework.helper.Helper.*;
 
 public class AnnounceControllerTest extends TestContainerPostgre {
 
@@ -71,7 +71,7 @@ public class AnnounceControllerTest extends TestContainerPostgre {
                 .andExpect(jsonPath("$.results[1].author").value(answer.get(1).getAuthor()))
                 .andExpect(jsonPath("$.results[1].image").value(answer.get(1).getImage()))
                 .andExpect(jsonPath("$.results[1].pk").value(answer.get(1).getPk()))
-                .andExpect(jsonPath("$.results[1].price").value(answer.get(1).getPrice()))
+                .andExpect(jsonPath("$.results[1].price").value(1500))
                 .andExpect(jsonPath("$.results[1].title").value(answer.get(1).getTitle()));
     }
 }

@@ -13,3 +13,6 @@ CREATE TABLE announces(
 
 -- changeset vKvs: changed_length_string_image
 ALTER TABLE announces ALTER COLUMN image TYPE VARCHAR(128);
+
+-- changeset vKvs: Changed_path_image
+UPDATE announces SET image = SUBSTRING(image from length('/ads/imageAnnounce/') + 1) WHERE image LIKE '/ads/imageAnnounce/%';

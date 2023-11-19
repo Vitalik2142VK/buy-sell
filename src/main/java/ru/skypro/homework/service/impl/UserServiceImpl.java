@@ -11,6 +11,7 @@ import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.dto.user.UserDto;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.NotFoundUserException;
+import ru.skypro.homework.helper.WorkImagePathAndUrl;
 import ru.skypro.homework.mapping.UserMapper;
 import ru.skypro.homework.helper.WorkWithImage;
 import ru.skypro.homework.repository.UserRepository;
@@ -24,16 +25,19 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder encoder;
+    private final WorkImagePathAndUrl getPathImage;
 
     @Value("${user.image}")
     private String imagePath;
-    @Value("${user.url}")
-    private String userUrl;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder encoder) {
+    public UserServiceImpl(UserRepository userRepository,
+                           UserMapper userMapper,
+                           PasswordEncoder encoder,
+                           WorkImagePathAndUrl getPathImage) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.encoder = encoder;
+        this.getPathImage = getPathImage;
     }
 
     /**
@@ -85,10 +89,15 @@ public class UserServiceImpl implements UserService {
     public void putUserImage(MultipartFile image, UserAuth userDetails) throws IOException {
         User user = userDetails.getUser().orElseThrow(NotFoundUserException::new);
         if (user.getImage() == null || user.getImage().isEmpty()) {
-            user.setImage(WorkWithImage.saveAndGetStringImage(userUrl, imagePath, user.toString(), image));
+            user.setImage(WorkWithImage.saveAndGetStringImage(imagePath, user.toString(), image));
         } else {
-            user.setImage(WorkWithImage.updateAndGetStringImage(userUrl, imagePath, user.getImage(), image));
+            user.setImage(WorkWithImage.updateAndGetStringImage(imagePath, user.getImage(), image));
         }
         userRepository.save(user);
+    }
+
+    @Override
+    public byte[] getImage(String nameImage) throws IOException {
+        return WorkWithImage.loadImage(getPathImage.getUserImagePath(nameImage));
     }
 }

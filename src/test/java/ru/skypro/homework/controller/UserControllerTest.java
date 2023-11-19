@@ -2,20 +2,13 @@ package ru.skypro.homework.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.skypro.homework.TestContainerPostgre;
 import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.component.UserAuthDetailsService;
-import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.user.UserDto;
 import ru.skypro.homework.mapping.UserMapper;
 import ru.skypro.homework.repository.UserRepository;
@@ -23,13 +16,10 @@ import ru.skypro.homework.service.UserService;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.skypro.homework.helper.HelperUser.createUser;
-import static ru.skypro.homework.helper.HelperUser.insertUsers;
+import static ru.skypro.homework.helper.Helper.insertUsers;
 
 public class UserControllerTest extends TestContainerPostgre{
     @Autowired

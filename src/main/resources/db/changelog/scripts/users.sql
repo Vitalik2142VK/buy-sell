@@ -15,3 +15,6 @@ CREATE TABLE users(
 -- changeset vKvs: Add_column_password_and_constraint_email
 ALTER TABLE users ADD COLUMN password CHARACTER VARYING (255) NOT NULL;
 ALTER TABLE users ADD CONSTRAINT unique_email UNIQUE (email);
+
+-- changeset vKvs: Changed_path_image
+UPDATE users SET image = SUBSTRING(image from length('/users/imageUser/') + 1) WHERE image LIKE '/users/imageUser/%';
