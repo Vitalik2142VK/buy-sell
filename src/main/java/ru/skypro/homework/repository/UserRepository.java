@@ -8,11 +8,10 @@ import ru.skypro.homework.entity.User;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
+    boolean existsByEmail(String email);
+
     Optional<User> findFirstByEmail(String email);
 
     @Query("SELECT u.id FROM User u WHERE u.email = :email")
     Optional<Integer> getIdUserByEmail(@Param("email")String email);
-
-    @Query("SELECT true FROM User u WHERE u.email = :email")
-    Optional<Boolean> checkUserByEmail(@Param("email")String email);
 }

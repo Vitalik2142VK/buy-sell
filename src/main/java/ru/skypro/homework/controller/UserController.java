@@ -20,17 +20,16 @@ import ru.skypro.homework.dto.user.NewPasswordUser;
 import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.dto.user.UserDto;
 import ru.skypro.homework.exception.NotFoundUserException;
-import ru.skypro.homework.model.WorkWithImage;
+import ru.skypro.homework.helper.WorkWithImage;
 import ru.skypro.homework.service.UserService;
 
 import java.io.IOException;
 
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/${user.url}")
 @Tag(name = "Пользователи")
 public class UserController {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
@@ -130,10 +129,10 @@ public class UserController {
         }
     }
 
-    @GetMapping("/${user.image}/{image_path}")
-    public ResponseEntity<?> getImage(@PathVariable("image_path") String imagePath) {
+    @GetMapping("/${user.image}/{image_name}")
+    public ResponseEntity<?> getImage(@PathVariable("image_name") String imageName) {
         try {
-            return ResponseEntity.ok(WorkWithImage.loadImage(path + '\\' + imagePath));
+            return ResponseEntity.ok(userService.getImage(imageName));
         } catch (IOException e) {
             LOGGER.error("Error writing file to output stream. Exception: '" + e.getMessage() + "'", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

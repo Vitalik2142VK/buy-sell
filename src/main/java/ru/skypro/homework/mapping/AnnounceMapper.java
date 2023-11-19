@@ -2,14 +2,11 @@ package ru.skypro.homework.mapping;
 
 import org.springframework.stereotype.Component;
 import ru.skypro.homework.dto.announce.AnnouncesDtoOut;
-import ru.skypro.homework.dto.comment.CommentDto;
-import ru.skypro.homework.dto.comment.CommentsDto;
 import ru.skypro.homework.entity.Announce;
 import ru.skypro.homework.dto.announce.AnnounceDtoIn;
 import ru.skypro.homework.dto.announce.AnnounceDtoOut;
-import ru.skypro.homework.entity.Comment;
-import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.NotFoundUserException;
+import ru.skypro.homework.helper.WorkImagePathAndUrl;
 import ru.skypro.homework.repository.UserRepository;
 
 import java.util.List;
@@ -18,15 +15,17 @@ import java.util.stream.Collectors;
 @Component
 public class AnnounceMapper {
     private final UserRepository userRepository;
+    private final WorkImagePathAndUrl urlImage;
 
-    public AnnounceMapper(UserRepository userRepository) {
+    public AnnounceMapper(UserRepository userRepository, WorkImagePathAndUrl urlImage) {
         this.userRepository = userRepository;
+        this.urlImage = urlImage;
     }
 
     public AnnounceDtoOut toDTO(Announce announce) {
         AnnounceDtoOut announceDtoOut = new AnnounceDtoOut();
         announceDtoOut.setAuthor(announce.getAuthor().getId());
-        announceDtoOut.setImage(announce.getImage());
+        announceDtoOut.setImage(urlImage.getAdsImageUrl(announce.getImage()));
         announceDtoOut.setPk(announce.getId());
         announceDtoOut.setPrice(announce.getPrice());
         announceDtoOut.setTitle(announce.getTitle());

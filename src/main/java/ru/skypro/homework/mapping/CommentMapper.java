@@ -6,14 +6,19 @@ import ru.skypro.homework.dto.comment.CommentDto;
 import ru.skypro.homework.dto.comment.CommentsDto;
 import ru.skypro.homework.dto.comment.CreateOrUpdateCommentDto;
 import ru.skypro.homework.entity.Comment;
+import ru.skypro.homework.helper.WorkImagePathAndUrl;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class CommentMapper {
+    private final WorkImagePathAndUrl urlImage;
+
+    public CommentMapper(WorkImagePathAndUrl urlImage) {
+        this.urlImage = urlImage;
+    }
 
     /**
      * A method that converts an object of the Comment class to an object of the CommentDto class.
@@ -21,7 +26,7 @@ public class CommentMapper {
     public CommentDto mapToCommentDto(Comment comment) {
         CommentDto commentDto = new CommentDto();
         commentDto.setAuthor(comment.getAuthor().getId());
-        commentDto.setAuthorImage(comment.getAuthor().getImage());
+        commentDto.setAuthorImage(urlImage.getUserImageUrl(comment.getAuthor().getImage()));
         commentDto.setAuthorFirstName(comment.getAuthor().getFirstName());
         commentDto.setCreatedAt(comment.getCreatedAt());
         commentDto.setPk(comment.getId());
@@ -35,7 +40,7 @@ public class CommentMapper {
     public Comment mapToNewComment(CreateOrUpdateCommentDto commentDto) {
         Comment comment = new Comment();
         comment.setText(commentDto.getText());
-        comment.setCreatedAt(Instant.now().getEpochSecond());
+        comment.setCreatedAt(System.currentTimeMillis());
         return comment;
     }
 

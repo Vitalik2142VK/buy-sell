@@ -12,10 +12,8 @@ import java.io.IOException;
 public interface UserService {
 
     boolean changePassword(NewPasswordUser newPassword, UserAuth userDetails);
-
     UserDto getUserDto(UserAuth userDetails);
-
     UserChangeDto putUser(UserChangeDto userChange, UserAuth userDetails);
-
     void putUserImage(MultipartFile image, UserAuth userDetails) throws IOException;
+    byte[] getImage(String nameImage) throws IOException;
 }

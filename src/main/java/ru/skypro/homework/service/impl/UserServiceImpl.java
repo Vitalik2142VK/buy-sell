@@ -1,6 +1,5 @@
 package ru.skypro.homework.service.impl;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,8 +11,9 @@ import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.dto.user.UserDto;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.NotFoundUserException;
+import ru.skypro.homework.helper.WorkImagePathAndUrl;
 import ru.skypro.homework.mapping.UserMapper;
-import ru.skypro.homework.model.WorkWithImage;
+import ru.skypro.homework.helper.WorkWithImage;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.UserService;
 
@@ -25,14 +25,19 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder encoder;
+    private final WorkImagePathAndUrl getPathImage;
 
     @Value("${user.image}")
     private String imagePath;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder encoder) {
+    public UserServiceImpl(UserRepository userRepository,
+                           UserMapper userMapper,
+                           PasswordEncoder encoder,
+                           WorkImagePathAndUrl getPathImage) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.encoder = encoder;
+        this.getPathImage = getPathImage;
     }
 
     /**
@@ -89,5 +94,10 @@ public class UserServiceImpl implements UserService {
             user.setImage(WorkWithImage.updateAndGetStringImage(imagePath, user.getImage(), image));
         }
         userRepository.save(user);
+    }
+
+    @Override
+    public byte[] getImage(String nameImage) throws IOException {
+        return WorkWithImage.loadImage(getPathImage.getUserImagePath(nameImage));
     }
 }
