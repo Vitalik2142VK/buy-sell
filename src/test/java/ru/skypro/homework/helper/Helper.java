@@ -12,12 +12,13 @@ import ru.skypro.homework.repository.UserRepository;
 public class Helper {
     private Helper() {}
 
-    public static User createUser(String email, String password, String firstName, String lastName, String image, Role role, PasswordEncoder encoder) {
+    public static User createUser(String email, String password, String firstName, String lastName, String phone, String image, Role role, PasswordEncoder encoder) {
         User user = new User();
         user.setEmail(email);
         user.setPassword(encoder.encode(password));
         user.setFirstName(firstName);
         user.setLastName(lastName);
+        user.setPhone(phone);
         user.setImage(image);
         user.setRole(role);
         return user;
@@ -29,6 +30,7 @@ public class Helper {
                 "12345678",
                 "Иван",
                 "Иванов",
+                "+78001111111",
                 null,
                 Role.USER,
                 encoder
@@ -38,6 +40,7 @@ public class Helper {
                 "87654321",
                 "Петр",
                 "Петров",
+                "+78002222222",
                 null,
                 Role.USER,
                 encoder
