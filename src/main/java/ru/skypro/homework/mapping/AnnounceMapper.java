@@ -2,9 +2,11 @@ package ru.skypro.homework.mapping;
 
 import org.springframework.stereotype.Component;
 import ru.skypro.homework.dto.announce.AnnouncesDtoOut;
+import ru.skypro.homework.dto.announce.CreateOrUpdateAd;
 import ru.skypro.homework.entity.Announce;
 import ru.skypro.homework.dto.announce.AnnounceDtoIn;
 import ru.skypro.homework.dto.announce.AnnounceDtoOut;
+import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.NotFoundUserException;
 import ru.skypro.homework.helper.WorkImagePathAndUrl;
 import ru.skypro.homework.repository.UserRepository;
@@ -39,6 +41,47 @@ public class AnnounceMapper {
         announce.setImage(announceDtoIn.getImage());
         announce.setPrice(announceDtoIn.getPrice());
         announce.setTitle(announceDtoIn.getTitle());
+        return announce;
+    }
+
+    /**
+     *
+     * the method fills some of the fields of the AnnounceDtoIn object
+     */
+    public AnnounceDtoIn toDtoIn(Announce announce, User user) {
+        AnnounceDtoIn announceDtoIn = new AnnounceDtoIn();
+        announceDtoIn.setDescription(announce.getDescription());
+        announceDtoIn.setImage(urlImage.getAdsImageUrl(announce.getImage()));
+        announceDtoIn.setPrice(announce.getPrice());
+        announceDtoIn.setTitle(announce.getTitle());
+        announceDtoIn.setPk(user.getId());
+        announceDtoIn.setAuthorFirstName(user.getFirstName());
+        announceDtoIn.setAuthorLastName(user.getLastName());
+        announceDtoIn.setEmail(user.getEmail());
+        announceDtoIn.setPhone(user.getPhone());
+        return announceDtoIn;
+    }
+
+    /**
+     * the method fills some of the fields of the AnnounceDtoIn object for update method
+     */
+    public Announce toAnnounce(CreateOrUpdateAd properties, Announce announce) {
+        announce.setDescription(properties.getDescription());
+        announce.setPrice(properties.getPrice());
+        announce.setTitle(properties.getTitle());
+        return announce;
+    }
+
+    /**
+     * the method fills some of the fields of the AnnounceDtoIn object for add method
+     */
+    public Announce toAnnounce(CreateOrUpdateAd properties, User user, String work) {
+        Announce announce = new Announce();
+        announce.setAuthor(user);
+        announce.setImage(work);
+        announce.setDescription(properties.getDescription());
+        announce.setPrice(properties.getPrice());
+        announce.setTitle(properties.getTitle());
         return announce;
     }
 

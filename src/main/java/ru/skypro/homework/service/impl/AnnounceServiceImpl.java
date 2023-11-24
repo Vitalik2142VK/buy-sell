@@ -1,5 +1,7 @@
 package ru.skypro.homework.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import java.util.Optional;
 
 @Service
 public class AnnounceServiceImpl implements AnnounceService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnnounceServiceImpl.class);
     private final AnnounceRepository announceRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
@@ -75,15 +78,7 @@ public class AnnounceServiceImpl implements AnnounceService {
     @Override
     public AnnounceDtoIn get(Integer id) {
         var announce = announceRepository.findById(id).orElseThrow(NotFoundAnnounceException::new);
-        var announceDtoIn = new AnnounceDtoIn();
-
-        fillUsersFields(announceDtoIn, Optional.ofNullable(announce.getAuthor()).orElseThrow(NotFoundUserException::new));
-        //todo перенести в маппер
-        announceDtoIn.setDescription(announce.getDescription());
-        announceDtoIn.setImage(getPathImage.getAdsImageUrl(announce.getImage()));
-        announceDtoIn.setPrice(announce.getPrice());
-        announceDtoIn.setTitle(announce.getTitle());
-        return announceDtoIn;
+        return announceMapper.toDtoIn(announce, Optional.ofNullable(announce.getAuthor()).orElseThrow(NotFoundUserException::new));
     }
 
     /**
@@ -97,15 +92,9 @@ public class AnnounceServiceImpl implements AnnounceService {
         User user = userDetails.getUser().orElseThrow(NotFoundUserException::new);
         int numberAds = announceRepository.getNumberUserAds(user.getId()) + 1;
         String fileName = "Ads_" + numberAds + "_auth_" + user.getId() + "_lg_" + user.getEmail().hashCode();
-        //todo перенести в маппер
-        Announce announce = new Announce();
-        announce.setAuthor(user);
-        announce.setDescription(properties.getDescription());
-        announce.setPrice(properties.getPrice());
-        announce.setTitle(properties.getTitle());
-        announce.setImage(WorkWithImage.saveAndGetStringImage(imagePath, fileName, image));
-        //todo добавить лог о добавлении объявления
-        return announceMapper.toDTO(announceRepository.save(announce));
+        Announce announce = announceRepository.save(announceMapper.toAnnounce(properties, user, WorkWithImage.saveAndGetStringImage(imagePath, fileName, image)));
+        LOGGER.debug("Add new " + announce.getAuthor() + ": " + announce.getTitle() + " " + announce.getDescription());
+        return announceMapper.toDTO(announce);
     }
 
     /**
@@ -121,7 +110,7 @@ public class AnnounceServiceImpl implements AnnounceService {
             comments.forEach(commentRepository::delete);
         }
         WorkWithImage.removeImage(getPathImage.getAdsImagePath(announce.getImage()));
-        //todo добавить лог об удалении объявления
+        LOGGER.debug("Successfully deleted announce - " + announce);
         announceRepository.delete(announce);
     }
 
@@ -133,11 +122,7 @@ public class AnnounceServiceImpl implements AnnounceService {
     @PreAuthorize("hasRole('ADMIN') or @announceServiceImpl.checkAuthor(principal, #announceId)")
     public AnnounceDtoOut updateInfo(Integer announceId, CreateOrUpdateAd property) {
         var announce = announceRepository.findById(announceId).orElseThrow(NotFoundAnnounceException::new);
-        //todo перенести в маппер
-        announce.setDescription(property.getDescription());
-        announce.setTitle(announce.getTitle());
-        announce.setPrice(property.getPrice());
-        return announceMapper.toDTO(announceRepository.save(announce));
+        return announceMapper.toDTO(announceRepository.save(announceMapper.toAnnounce(property, announce)));
     }
 
     /**
@@ -166,17 +151,5 @@ public class AnnounceServiceImpl implements AnnounceService {
     private boolean checkAuthor(Principal principal, int announceId) {
         int idUser = userRepository.getIdUserByEmail(principal.getName()).orElseThrow(NotFoundUserException::new);
         return announceRepository.checkAuthorAnnounce(announceId, idUser).orElseThrow(UserNotAuthorAnnounceException::new);
-    }
-
-    /**
-     *
-     * the method fills some of the fields of the AnnounceDtoIn object
-     */
-    private void fillUsersFields(AnnounceDtoIn announceDtoIn, User user) {
-        announceDtoIn.setPk(user.getId());
-        announceDtoIn.setAuthorFirstName(user.getFirstName());
-        announceDtoIn.setAuthorLastName(user.getLastName());
-        announceDtoIn.setEmail(user.getEmail());
-        announceDtoIn.setPhone(user.getPhone());
     }
 }
