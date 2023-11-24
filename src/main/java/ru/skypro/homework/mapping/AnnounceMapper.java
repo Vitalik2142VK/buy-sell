@@ -63,12 +63,22 @@ public class AnnounceMapper {
     }
 
     /**
-     * the method fills some of the fields of the AnnounceDtoIn object
+     * the method fills some of the fields of the AnnounceDtoIn object for update method
      */
-    public Announce toAnounce(CreateOrUpdateAd properties, User user, String work, Announce announce) {
-        if (announce == null) announce = new Announce();
-        if (user != null) announce.setAuthor(user);
-        if (work != null) announce.setImage(work);
+    public Announce toAnnounce(CreateOrUpdateAd properties, Announce announce) {
+        announce.setDescription(properties.getDescription());
+        announce.setPrice(properties.getPrice());
+        announce.setTitle(properties.getTitle());
+        return announce;
+    }
+
+    /**
+     * the method fills some of the fields of the AnnounceDtoIn object for add method
+     */
+    public Announce toAnnounce(CreateOrUpdateAd properties, User user, String work) {
+        Announce announce = new Announce();
+        announce.setAuthor(user);
+        announce.setImage(work);
         announce.setDescription(properties.getDescription());
         announce.setPrice(properties.getPrice());
         announce.setTitle(properties.getTitle());

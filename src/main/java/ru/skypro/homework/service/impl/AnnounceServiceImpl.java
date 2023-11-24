@@ -92,7 +92,7 @@ public class AnnounceServiceImpl implements AnnounceService {
         User user = userDetails.getUser().orElseThrow(NotFoundUserException::new);
         int numberAds = announceRepository.getNumberUserAds(user.getId()) + 1;
         String fileName = "Ads_" + numberAds + "_auth_" + user.getId() + "_lg_" + user.getEmail().hashCode();
-        Announce announce = announceRepository.save(announceMapper.toAnounce(properties, user, WorkWithImage.saveAndGetStringImage(imagePath, fileName, image), null));
+        Announce announce = announceRepository.save(announceMapper.toAnnounce(properties, user, WorkWithImage.saveAndGetStringImage(imagePath, fileName, image)));
         LOGGER.debug("Add new " + announce.getAuthor() + ": " + announce.getTitle() + " " + announce.getDescription());
         return announceMapper.toDTO(announce);
     }
@@ -122,7 +122,7 @@ public class AnnounceServiceImpl implements AnnounceService {
     @PreAuthorize("hasRole('ADMIN') or @announceServiceImpl.checkAuthor(principal, #announceId)")
     public AnnounceDtoOut updateInfo(Integer announceId, CreateOrUpdateAd property) {
         var announce = announceRepository.findById(announceId).orElseThrow(NotFoundAnnounceException::new);
-        return announceMapper.toDTO(announceRepository.save(announceMapper.toAnounce(property, null, null, announce)));
+        return announceMapper.toDTO(announceRepository.save(announceMapper.toAnnounce(property, announce)));
     }
 
     /**
