@@ -1,7 +1,5 @@
 package ru.skypro.homework.service;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.dto.comment.CommentDto;
 import ru.skypro.homework.dto.comment.CommentsDto;

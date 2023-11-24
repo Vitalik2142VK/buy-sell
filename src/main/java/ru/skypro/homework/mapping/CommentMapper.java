@@ -1,14 +1,11 @@
 package ru.skypro.homework.mapping;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.skypro.homework.dto.comment.CommentDto;
 import ru.skypro.homework.dto.comment.CommentsDto;
 import ru.skypro.homework.dto.comment.CreateOrUpdateCommentDto;
 import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.helper.WorkImagePathAndUrl;
-
-import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 

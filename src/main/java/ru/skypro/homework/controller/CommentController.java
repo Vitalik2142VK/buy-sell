@@ -17,10 +17,7 @@ import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.dto.comment.CommentDto;
 import ru.skypro.homework.dto.comment.CommentsDto;
 import ru.skypro.homework.dto.comment.CreateOrUpdateCommentDto;
-import ru.skypro.homework.exception.NotFoundAnnounceException;
-import ru.skypro.homework.exception.NotFoundCommentException;
-import ru.skypro.homework.exception.NotFoundUserException;
-import ru.skypro.homework.exception.UserNotAuthorCommentException;
+import ru.skypro.homework.exception.*;
 import ru.skypro.homework.service.CommentService;
 
 import javax.validation.Valid;
@@ -80,7 +77,7 @@ public class CommentController {
                                                     @AuthenticationPrincipal UserAuth userDetails) {
         try {
             return ResponseEntity.ok(commentService.createComment(id, createOrUpdateCommentDto, userDetails));
-        } catch (NotFoundCommentException e) {
+        } catch (NotFoundUserException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (NotFoundAnnounceException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -114,7 +111,7 @@ public class CommentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (UserNotAuthorCommentException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        } catch (NotFoundCommentException | NotFoundAnnounceException e) {
+        } catch (NotFoundAnnounceException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
