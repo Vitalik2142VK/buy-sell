@@ -57,20 +57,23 @@ public class Helper {
         return announce;
     }
 
-    public static void insertAnnounce(AnnounceRepository repository, User user) {
-        repository.save(createAnnounce(
+    public static Announce insertAnnounce(AnnounceRepository repository, User user) {
+        Announce announce = createAnnounce(
                 user,
                 "Описание объявления",
                 "null",
                 1000,
                 "Заголовок объявления"
-        ));
+        );
+        repository.save(announce);
+        return announce;
     }
 
     public static Comment createComment(User author, Announce ad, String text) {
         Comment comment = new Comment();
         comment.setAuthor(author);
         comment.setAd(ad);
+        comment.setCreatedAt(System.currentTimeMillis());
         comment.setText(text);
         return comment;
     }

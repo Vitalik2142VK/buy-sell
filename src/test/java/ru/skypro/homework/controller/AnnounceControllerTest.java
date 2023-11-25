@@ -1,18 +1,25 @@
 package ru.skypro.homework.controller;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.TestContainerPostgre;
+import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.component.UserAuthDetailsService;
+import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.announce.AnnounceDtoOut;
 import ru.skypro.homework.dto.announce.AnnouncesDtoOut;
+import ru.skypro.homework.dto.announce.CreateOrUpdateAd;
 import ru.skypro.homework.entity.Announce;
 import ru.skypro.homework.entity.User;
+import ru.skypro.homework.exception.NotFoundCommentException;
 import ru.skypro.homework.mapping.AnnounceMapper;
 import ru.skypro.homework.repository.AnnounceRepository;
 import ru.skypro.homework.repository.CommentRepository;
@@ -21,9 +28,12 @@ import ru.skypro.homework.service.AnnounceService;
 
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,102 +57,139 @@ public class AnnounceControllerTest extends TestContainerPostgre {
     @Autowired
     private AnnounceController announceController;
 
-//    @Test
-//    public void getAllAnnounceTest() throws Exception {
-//        insertUsers(userRepository, encoder);
-//        User author = userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow();
-//        Announce ad = announceRepository.save(createAnnounce(
-//                author,
-//                "Описание объявления",
-//                "null",
-//                1000,
-//                "Заголовок объявления"));
-//
-//
-//        AnnouncesDtoOut dto = announceService.getAll();
-//        AnnounceDtoOut dtoOut = dto.getResults().get(0);
-//
-//
-//        mockMvc.perform(MockMvcRequestBuilders
-//                        .get("/ads")
-//                        .header(HttpHeaders.AUTHORIZATION, "Basic " + HttpHeaders.encodeBasicAuth("ivanov@gmail.com", "12345678", StandardCharsets.UTF_8))
-//                        .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$", hasSize(2)))
-//                .andExpect(jsonPath("$.[0].author").value(dtoOut.getAuthor()))
-//                .andExpect(jsonPath("$.[0].description").value(dtoOut.getTitle()));
-//    }
-//
-//    @Test
-//    @Transactional
-//    void deleteAnnounceTest() throws Exception {
-//        insertUsers(userRepository, encoder);
-//        insertAnnounce(announceRepository, userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow());
-//        Announce ad = announceRepository.save(createAnnounce(
-//                userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow(),
-//                "Описание объявления 3",
-//                "null",
-//                2000,
-//                "Заголовок объявления 3"));// delete?
-//
-//        mockMvc.perform(
-//                        delete("/ads/" + ad.getId())
-//                                .header(HttpHeaders.USER_AGENT, "Basic " + HttpHeaders.encodeBasicAuth("sidorov@gmail.com", "11223344", StandardCharsets.UTF_8))
-//                                .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isUnauthorized());
-//
-//    }
-//
-//    @Test
-//    @Transactional
-//    void updateAnnounceTest() throws Exception {
-//        String title = "Заголовок объявления 3";
-//        insertUsers(userRepository, encoder);
-//        insertAnnounce(announceRepository, userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow());
-//        Announce ad = announceRepository.save(createAnnounce(
-//                userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow(),
-//                "Описание объявления 3",
-//                "null",
-//                2000,
-//                title));
-//
-//        String titleNew = "Заголовок объявления 123";
-//
-//
-//        mockMvc.perform(
-//                        patch("/ads/" + ad.getId())
-//                                .header(HttpHeaders.AUTHORIZATION, "Basic " + HttpHeaders.encodeBasicAuth("ivanov@gmail.com", "12345678", StandardCharsets.UTF_8))
-//                                .contentType(MediaType.APPLICATION_JSON)
-//                                .content(titleNew))
-//                .andExpect(status().isOk());
-//
-//    }
-//
+    @Test
+    @Transactional
+    public void getAllAnnounceTest() throws Exception {
+        insertUsers(userRepository, encoder);
+        insertAnnounce(announceRepository, userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow());
+        announceRepository.save(createAnnounce(
+                userRepository.findFirstByEmail("ivanov@gmail.com").orElseThrow(),
+                "Описание объявления 2",
+                "null",
+                1500,
+                "Заголовок объявления 2"));
+
+        AnnouncesDtoOut dto = announceService.getAll();
+        List<AnnounceDtoOut> answer = dto.getResults();
+
+        mockMvc.perform(
+                        get("/ads")
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count").value(dto.getCount()))
+                .andExpect(jsonPath("$.results", hasSize(2)))
+                .andExpect(jsonPath("$.results[0].author").value(answer.get(0).getAuthor()))
+                .andExpect(jsonPath("$.results[0].image").value(answer.get(0).getImage()))
+                .andExpect(jsonPath("$.results[0].pk").value(answer.get(0).getPk()))
+                .andExpect(jsonPath("$.results[0].price").value(answer.get(0).getPrice()))
+                .andExpect(jsonPath("$.results[0].title").value(answer.get(0).getTitle()))
+                .andExpect(jsonPath("$.results[1].author").value(answer.get(1).getAuthor()))
+                .andExpect(jsonPath("$.results[1].image").value(answer.get(1).getImage()))
+                .andExpect(jsonPath("$.results[1].pk").value(answer.get(1).getPk()))
+                .andExpect(jsonPath("$.results[1].price").value(1500))
+                .andExpect(jsonPath("$.results[1].title").value(answer.get(1).getTitle()));
+    }
+
+    @Test
+    @Transactional
+    void deleteAnnounceTest() throws Exception {
+        insertUsers(userRepository, encoder);
+        User admin = userRepository.save(createUser(
+                "admin@gmail.com",
+                "0102030405",
+                "Админ",
+                "Админов",
+                "+78001111111",
+                null,
+                Role.ADMIN,
+                encoder
+        ));
+        Announce ad = announceRepository.save(createAnnounce(
+                userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow(),
+                "Описание объявления 3",
+                "null",
+                2000,
+                "Заголовок объявления 3"));
+
+        mockMvc.perform(
+                        delete("/ads/" + ad.getId())
+                                .header(HttpHeaders.AUTHORIZATION, "Basic " + HttpHeaders.encodeBasicAuth("admin@gmail.com", "0102030405", StandardCharsets.UTF_8))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        assertThrows(NotFoundCommentException.class, () -> announceRepository.findById(ad.getId()).orElseThrow(NotFoundCommentException::new));
+    }
+
+    @Test
+    @Transactional
+    void updateAnnounceTest() throws Exception {
+        insertUsers(userRepository, encoder);
+        User author = userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow();
+        Announce ad = insertAnnounce(announceRepository, author);
+
+        CreateOrUpdateAd dto = new CreateOrUpdateAd();
+        dto.setTitle("Измененный заголовок");
+        dto.setPrice(2000);
+        dto.setDescription("Измененное описание");
+
+        JSONObject body = new JSONObject();
+        body.put("title", dto.getTitle());
+        body.put("price", dto.getPrice());
+        body.put("description", dto.getDescription());
+
+        mockMvc.perform(
+                        patch("/ads/" + ad.getId())
+                                .header(HttpHeaders.AUTHORIZATION, "Basic " + HttpHeaders.encodeBasicAuth("ivanov@gmail.com", "12345678", StandardCharsets.UTF_8))
+                                .content(body.toString())
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.author").value(ad.getAuthor().getId()))
+                .andExpect(jsonPath("$.image").value("/ads/imageAnnounce/null"))
+                .andExpect(jsonPath("$.pk").value(ad.getId()))
+                .andExpect(jsonPath("$.price").value(2000))
+                .andExpect(jsonPath("$.title").value("Измененный заголовок"));
+
+        Announce actual = announceRepository.findById(ad.getId()).orElseThrow();
+
+        assertEquals("Измененный заголовок", actual.getTitle());
+        assertEquals(2000, actual.getPrice());
+        assertEquals("Измененное описание", actual.getDescription());
+    }
+
 //    @Test
 //    @Transactional
 //    void addAnnounceTest() throws Exception {
 //        insertUsers(userRepository, encoder);
 //        User author = userRepository.findFirstByEmail("ivanov@gmail.com").orElseThrow();
-//        Announce ad = announceRepository.save(createAnnounce(
-//                userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow(),
-//                "Описание объявления 3",
-//                "null",
-//                2000,
-//                "Заголовок объявления 3"));
 //
-//        AnnouncesDtoOut dto = announceService.getAll();
-//        AnnounceDtoOut dtoOut = dto.getResults().get(0);
+//        CreateOrUpdateAd dto = new CreateOrUpdateAd();
+//        dto.setTitle("Измененный заголовок");
+//        dto.setPrice(2000);
+//        dto.setDescription("Измененное описание");
 //
+//        JSONObject body = new JSONObject();
+//        body.put("title", dto.getTitle());
+//        body.put("price", dto.getPrice());
+//        body.put("description", dto.getDescription());
+//
+//        MultipartFile file = new MockMultipartFile("file",
+//                "myFile.jpg", MediaType.APPLICATION_PDF_VALUE, new byte[]{1, 2, 3});
+//        UserAuth userDetails = (UserAuth) userDetailsService.loadUserByUsername("ivanov@gmail.com");
+//
+//        String imageName = announceService.add(dto, file, userDetails).getImage();
 //
 //        mockMvc.perform(
-//                        post("/ads/" + ad.getId())
+//                        post("/ads")
 //                                .header(HttpHeaders.AUTHORIZATION, "Basic " + HttpHeaders.encodeBasicAuth("ivanov@gmail.com", "12345678", StandardCharsets.UTF_8))
+//                                .content(body.toString())
+//                                .content(file.getBytes())
 //                                .contentType(MediaType.APPLICATION_JSON))
 //                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.author").value(dtoOut.getAuthor()))
-//                .andExpect(jsonPath("$.authorImage").value(dtoOut.getImage()))
-//                .andExpect(jsonPath("$.authorFirstName").value("Иван"))
-//                .andExpect(jsonPath("$.pk").value(dtoOut.getPk()));
+//                .andExpect(jsonPath("$.author").value(author.getId()))
+//                .andExpect(jsonPath("$.image").value(imageName))
+//                .andExpect(jsonPath("$.pk").value("Иван"))
+//                .andExpect(jsonPath("$.price").value(dtoOut.getPk()))
+//                .andExpect(jsonPath("$.title").value(dtoOut.getPk()));
 //
 //    }
 }

@@ -8,9 +8,4 @@ public class CreateOrUpdateCommentDto {
 
     @Schema(description = "текст комментария", minLength = 8, maxLength = 64)
     private String text;
-
-    public CreateOrUpdateCommentDto(String text) {
-
-    }
-
 }

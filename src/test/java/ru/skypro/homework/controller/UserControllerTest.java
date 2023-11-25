@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.TestContainerPostgre;
 import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.component.UserAuthDetailsService;
@@ -126,7 +127,7 @@ public class UserControllerTest extends TestContainerPostgre{
         assertEquals("+79808808080", actual.getPhone());
     }
 
-    //    @Test
+//    @Test
 //    @Transactional
 //    public void putUserImageTest() throws Exception {
 //        userRepository.save(createUser(
@@ -140,7 +141,7 @@ public class UserControllerTest extends TestContainerPostgre{
 //                encoder
 //        ));
 //
-//        MockMultipartFile file = new MockMultipartFile("file",
+//        MultipartFile file = new MockMultipartFile("file",
 //                "myFile.jpg", MediaType.APPLICATION_PDF_VALUE, new byte[]{1, 2, 3});
 //
 //        mockMvc.perform(
