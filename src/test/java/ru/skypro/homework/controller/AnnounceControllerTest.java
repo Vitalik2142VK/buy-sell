@@ -155,41 +155,4 @@ public class AnnounceControllerTest extends TestContainerPostgre {
         assertEquals(2000, actual.getPrice());
         assertEquals("Измененное описание", actual.getDescription());
     }
-
-//    @Test
-//    @Transactional
-//    void addAnnounceTest() throws Exception {
-//        insertUsers(userRepository, encoder);
-//        User author = userRepository.findFirstByEmail("ivanov@gmail.com").orElseThrow();
-//
-//        CreateOrUpdateAd dto = new CreateOrUpdateAd();
-//        dto.setTitle("Измененный заголовок");
-//        dto.setPrice(2000);
-//        dto.setDescription("Измененное описание");
-//
-//        JSONObject body = new JSONObject();
-//        body.put("title", dto.getTitle());
-//        body.put("price", dto.getPrice());
-//        body.put("description", dto.getDescription());
-//
-//        MultipartFile file = new MockMultipartFile("file",
-//                "myFile.jpg", MediaType.APPLICATION_PDF_VALUE, new byte[]{1, 2, 3});
-//        UserAuth userDetails = (UserAuth) userDetailsService.loadUserByUsername("ivanov@gmail.com");
-//
-//        String imageName = announceService.add(dto, file, userDetails).getImage();
-//
-//        mockMvc.perform(
-//                        post("/ads")
-//                                .header(HttpHeaders.AUTHORIZATION, "Basic " + HttpHeaders.encodeBasicAuth("ivanov@gmail.com", "12345678", StandardCharsets.UTF_8))
-//                                .content(body.toString())
-//                                .content(file.getBytes())
-//                                .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.author").value(author.getId()))
-//                .andExpect(jsonPath("$.image").value(imageName))
-//                .andExpect(jsonPath("$.pk").value("Иван"))
-//                .andExpect(jsonPath("$.price").value(dtoOut.getPk()))
-//                .andExpect(jsonPath("$.title").value(dtoOut.getPk()));
-//
-//    }
 }
