@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skypro.homework.TestContainerPostgre;
@@ -27,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.skypro.homework.helper.Helper.createUser;
 import static ru.skypro.homework.helper.Helper.insertUsers;
 
 public class UserControllerTest extends TestContainerPostgre{
@@ -123,4 +125,33 @@ public class UserControllerTest extends TestContainerPostgre{
         assertEquals("Эдисон", actual.getLastName());
         assertEquals("+79808808080", actual.getPhone());
     }
+
+    //    @Test
+//    @Transactional
+//    public void putUserImageTest() throws Exception {
+//        userRepository.save(createUser(
+//                "ivanov@gmail.com",
+//                "12345678",
+//                "Иван",
+//                "Иванов",
+//                "+78001111111",
+//                null,
+//                Role.USER,
+//                encoder
+//        ));
+//
+//        MockMultipartFile file = new MockMultipartFile("file",
+//                "myFile.jpg", MediaType.APPLICATION_PDF_VALUE, new byte[]{1, 2, 3});
+//
+//        mockMvc.perform(
+//                        patch("/users/me/image")
+//                                .header(HttpHeaders.AUTHORIZATION,"Basic " + HttpHeaders.encodeBasicAuth("petrov@gmail.com", "87654321", StandardCharsets.UTF_8))
+//                                .
+//                                .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk());
+//
+//        User actual = userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow();
+//
+//        assertEquals("Tомас", actual.getFirstName());
+//    }
 }
