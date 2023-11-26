@@ -23,7 +23,12 @@ public class CommentMapper {
     public CommentDto mapToCommentDto(Comment comment) {
         CommentDto commentDto = new CommentDto();
         commentDto.setAuthor(comment.getAuthor().getId());
-        commentDto.setAuthorImage(urlImage.getUserImageUrl(comment.getAuthor().getImage()));
+
+        if (comment.getAuthor().getImage() == null || comment.getAuthor().getImage().isEmpty()) {
+            commentDto.setAuthorImage(null);
+        } else {
+            commentDto.setAuthorImage(urlImage.getUserImageUrl(comment.getAuthor().getImage()));
+        }
         commentDto.setAuthorFirstName(comment.getAuthor().getFirstName());
         commentDto.setCreatedAt(comment.getCreatedAt());
         commentDto.setPk(comment.getId());
