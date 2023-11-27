@@ -1,5 +1,6 @@
 package ru.skypro.homework.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.TestContainerPostgre;
@@ -125,5 +127,34 @@ public class UserControllerTest extends TestContainerPostgre{
         assertEquals("Tомас", actual.getFirstName());
         assertEquals("Эдисон", actual.getLastName());
         assertEquals("+79808808080", actual.getPhone());
+    }
+
+    @Test
+    @Transactional
+    public void putUserImageTest() throws Exception {
+        insertUsers(userRepository, encoder);
+
+        MockMultipartFile image = new MockMultipartFile("image", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "1234".getBytes());
+        ObjectMapper objectMapper = new ObjectMapper();
+
+//        mockMvc.perform(
+//                        patch("/users/me/image")
+//                                .header(HttpHeaders.AUTHORIZATION,"Basic " + HttpHeaders.encodeBasicAuth("petrov@gmail.com", "87654321", StandardCharsets.UTF_8))
+//                                .contentType(MediaType.MULTIPART_FORM_DATA)
+//                                .content(objectMapper.writeValueAsString(image)))
+//                .andExpect(status().isOk());
+
+        mockMvc.perform(multipart("/users/me/image")
+                        .file(image)
+                        .header(HttpHeaders.AUTHORIZATION, "Basic " + HttpHeaders.encodeBasicAuth("petrov@gmail.com", "87654321", StandardCharsets.UTF_8)))
+                .andExpect(status().isOk());
+
+//        mockMvc.perform(patch("/url") .contentType(MULTIPART_FORM_DATA)
+//                .content(objectMapper.writeValueAsBytes(yourObject)))
+
+        User actual = userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow();
+        String imageExtend = "User_"+ actual.getId() + "_lg_" + actual.getEmail().hashCode();
+
+        assertEquals(imageExtend, actual.getImage());
     }
 }

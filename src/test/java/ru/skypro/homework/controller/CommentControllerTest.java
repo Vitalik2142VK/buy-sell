@@ -185,4 +185,30 @@ class CommentControllerTest extends TestContainerPostgre {
                 .andExpect(status().isUnauthorized());
 
     }
+
+    //    @Test
+//    @Transactional
+//    void updateCommentTest() throws Exception{
+//        insertUsers(userRepository, encoder);
+//        insertAnnounce(announceRepository, userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow());
+//        User author = userRepository.findFirstByEmail("ivanov@gmail.com").orElseThrow();
+//        Announce ad = announceRepository.save(createAnnounce(
+//                userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow(),
+//                "Описание объявления 3",
+//                "null",
+//                2000,
+//                "Заголовок объявления 3"));
+//
+//        String text = "Good product!";
+//        Comment comment = commentRepository.save(createComment(author, ad, text));
+//        String newComment = "Very good product";
+//
+//        mockMvc.perform(
+//                        patch("/ads/" + ad.getId() + "/comments/" + comment.getId())
+//                                .header(HttpHeaders.AUTHORIZATION,"Basic " + HttpHeaders.encodeBasicAuth("ivanov@gmail.com", "12345678", StandardCharsets.UTF_8))
+//                                .contentType(MediaType.APPLICATION_JSON)
+//                                .content(newComment))
+//                .andExpect(status().isOk());
+//
+//    }
 }
