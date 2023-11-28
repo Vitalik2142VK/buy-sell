@@ -5,10 +5,11 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.TestContainerPostgre;
@@ -26,8 +27,7 @@ import ru.skypro.homework.service.UserService;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -80,21 +80,20 @@ public class UserControllerTest extends TestContainerPostgre{
     public void getUserTest() throws Exception {
         insertUsers(userRepository, encoder);
 
-        UserAuth userDetails = (UserAuth) userDetailsService.loadUserByUsername("petrov@gmail.com");
-        UserDto dto = userService.getUserDto(userDetails);
+        User user = userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow();
 
         mockMvc.perform(
                 get("/users/me")
                         .header(HttpHeaders.AUTHORIZATION,"Basic " + HttpHeaders.encodeBasicAuth("petrov@gmail.com", "87654321", StandardCharsets.UTF_8))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(dto.getId()))
+                .andExpect(jsonPath("$.id").value(user.getId()))
                 .andExpect(jsonPath("$.email").value("petrov@gmail.com"))
                 .andExpect(jsonPath("$.firstName").value("Петр"))
                 .andExpect(jsonPath("$.lastName").value("Петров"))
                 .andExpect(jsonPath("$.phone").value("+78002222222"))
                 .andExpect(jsonPath("$.role").value(Role.USER.name()))
-                .andExpect(jsonPath("$.image").value(dto.getImage()));
+                .andExpect(jsonPath("$.image").value(user.getImage()));
     }
 
     @Test
@@ -132,29 +131,54 @@ public class UserControllerTest extends TestContainerPostgre{
     @Test
     @Transactional
     public void putUserImageTest() throws Exception {
-        insertUsers(userRepository, encoder);
+        userRepository.save(createUser(
+                        "petrov@gmail.com",
+                        "87654321",
+                        "Петр",
+                        "Петров",
+                        "+78002222222",
+                        null,
+                        Role.USER,
+                        encoder));
 
         MockMultipartFile image = new MockMultipartFile("image", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "1234".getBytes());
-        ObjectMapper objectMapper = new ObjectMapper();
 
-//        mockMvc.perform(
-//                        patch("/users/me/image")
-//                                .header(HttpHeaders.AUTHORIZATION,"Basic " + HttpHeaders.encodeBasicAuth("petrov@gmail.com", "87654321", StandardCharsets.UTF_8))
-//                                .contentType(MediaType.MULTIPART_FORM_DATA)
-//                                .content(objectMapper.writeValueAsString(image)))
-//                .andExpect(status().isOk());
-
-        mockMvc.perform(multipart("/users/me/image")
+        mockMvc.perform(multipart(HttpMethod.PATCH ,"/users/me/image")
                         .file(image)
                         .header(HttpHeaders.AUTHORIZATION, "Basic " + HttpHeaders.encodeBasicAuth("petrov@gmail.com", "87654321", StandardCharsets.UTF_8)))
                 .andExpect(status().isOk());
 
-//        mockMvc.perform(patch("/url") .contentType(MULTIPART_FORM_DATA)
-//                .content(objectMapper.writeValueAsBytes(yourObject)))
-
         User actual = userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow();
-        String imageExtend = "User_"+ actual.getId() + "_lg_" + actual.getEmail().hashCode();
+        String imageExtend = "User_"+ actual.getId() + "_lg_" + actual.getEmail().hashCode() + ".jpg";
 
         assertEquals(imageExtend, actual.getImage());
+    }
+
+    @Test
+    @Transactional
+    public void getImageTest() throws Exception {
+        User user = userRepository.save(createUser(
+                "petrov@gmail.com",
+                "87654321",
+                "Петр",
+                "Петров",
+                "+78002222222",
+                null,
+                Role.USER,
+                encoder));
+
+        MultipartFile image = new MockMultipartFile("image", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "1234".getBytes());
+        UserAuth userDetails = (UserAuth) userDetailsService.loadUserByUsername("petrov@gmail.com");
+        userService.putUserImage(image, userDetails);
+
+         mockMvc.perform(
+                        get(workImagePathAndUrl.getUserImageUrl(user.getImage()))
+                                .header(HttpHeaders.AUTHORIZATION,"Basic " + HttpHeaders.encodeBasicAuth("petrov@gmail.com", "87654321", StandardCharsets.UTF_8))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+         byte[] actual = userService.getImage(user.getImage());
+
+         assertArrayEquals("1234".getBytes(), actual);
     }
 }

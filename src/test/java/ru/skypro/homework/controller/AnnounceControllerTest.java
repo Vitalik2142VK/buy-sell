@@ -4,12 +4,11 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.TestContainerPostgre;
 import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.component.UserAuthDetailsService;
@@ -81,13 +80,85 @@ public class AnnounceControllerTest extends TestContainerPostgre {
                 .andExpect(jsonPath("$.results[0].author").value(answer.get(0).getAuthor()))
                 .andExpect(jsonPath("$.results[0].image").value(answer.get(0).getImage()))
                 .andExpect(jsonPath("$.results[0].pk").value(answer.get(0).getPk()))
-                .andExpect(jsonPath("$.results[0].price").value(answer.get(0).getPrice()))
-                .andExpect(jsonPath("$.results[0].title").value(answer.get(0).getTitle()))
+                .andExpect(jsonPath("$.results[0].price").value(1000))
+                .andExpect(jsonPath("$.results[0].title").value("Заголовок объявления"))
                 .andExpect(jsonPath("$.results[1].author").value(answer.get(1).getAuthor()))
                 .andExpect(jsonPath("$.results[1].image").value(answer.get(1).getImage()))
                 .andExpect(jsonPath("$.results[1].pk").value(answer.get(1).getPk()))
                 .andExpect(jsonPath("$.results[1].price").value(1500))
-                .andExpect(jsonPath("$.results[1].title").value(answer.get(1).getTitle()));
+                .andExpect(jsonPath("$.results[1].title").value("Заголовок объявления 2"));
+    }
+
+    @Test
+    @Transactional
+    public void getAllOfUserTest() throws Exception {
+        insertUsers(userRepository, encoder);
+        insertAnnounce(announceRepository, userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow());
+        announceRepository.save(createAnnounce(
+                userRepository.findFirstByEmail("ivanov@gmail.com").orElseThrow(),
+                "Описание объявления 2",
+                "null",
+                1500,
+                "Заголовок объявления 2"));
+
+        UserAuth userDetails = (UserAuth) userDetailsService.loadUserByUsername("ivanov@gmail.com");
+        AnnouncesDtoOut dto = announceService.getAllOfUser(userDetails);
+        List<AnnounceDtoOut> answer = dto.getResults();
+
+        mockMvc.perform(
+                        get("/ads/me")
+                                .header(HttpHeaders.AUTHORIZATION, "Basic " + HttpHeaders.encodeBasicAuth("ivanov@gmail.com", "12345678", StandardCharsets.UTF_8))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count").value(dto.getCount()))
+                .andExpect(jsonPath("$.results", hasSize(1)))
+                .andExpect(jsonPath("$.results[0].author").value(answer.get(0).getAuthor()))
+                .andExpect(jsonPath("$.results[0].image").value(answer.get(0).getImage()))
+                .andExpect(jsonPath("$.results[0].pk").value(answer.get(0).getPk()))
+                .andExpect(jsonPath("$.results[0].price").value(1500))
+                .andExpect(jsonPath("$.results[0].title").value("Заголовок объявления 2"));
+    }
+
+    @Test
+    @Transactional
+    public void addTest() throws Exception {
+        User author = userRepository.save(createUser(
+                "petrov@gmail.com",
+                "87654321",
+                "Петр",
+                "Петров",
+                "+78002222222",
+                null,
+                Role.USER,
+                encoder));
+
+
+        CreateOrUpdateAd dto = new CreateOrUpdateAd();
+        dto.setTitle("Заголовок объявления");
+        dto.setPrice(1500);
+        dto.setDescription("Описание объявления");
+
+        JSONObject body = new JSONObject();
+        body.put("title", dto.getTitle());
+        body.put("price", dto.getPrice());
+        body.put("description", dto.getDescription());
+
+        int numberAds = announceRepository.getNumberUserAds(author.getId()) + 1;
+        String imageExtend = "Ads_" + numberAds + "_auth_" + author.getId() + "_lg_" + author.getEmail().hashCode();
+
+        MockMultipartFile image = new MockMultipartFile("image", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "1234".getBytes());
+
+        mockMvc.perform(multipart("/ads")
+                                .file(image)
+                                .content(body.toString())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(HttpHeaders.AUTHORIZATION, "Basic " + HttpHeaders.encodeBasicAuth("petrov@gmail.com", "87654321", StandardCharsets.UTF_8)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.author").value(author.getId()))
+                .andExpect(jsonPath("$.image").value("/ads/imageAnnounce/" + imageExtend))
+                .andExpect(jsonPath("$.pk").isNotEmpty())
+                .andExpect(jsonPath("$.price").value(1500))
+                .andExpect(jsonPath("$.title").value("Заголовок объявления"));
     }
 
     @Test
