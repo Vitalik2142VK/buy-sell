@@ -34,6 +34,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.skypro.homework.helper.Helper.*;
@@ -146,13 +147,15 @@ public class AnnounceControllerTest extends TestContainerPostgre {
         int numberAds = announceRepository.getNumberUserAds(author.getId()) + 1;
         String imageExtend = "Ads_" + numberAds + "_auth_" + author.getId() + "_lg_" + author.getEmail().hashCode();
 
+        String stringJson = body.toString(); //"{\"title\":\"Заголовок объявления\",\"price\":1500,\"description\":\"Описание объявления\"}";
+
         MockMultipartFile image = new MockMultipartFile("image", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "1234".getBytes());
+        MockMultipartFile json = new MockMultipartFile("json", "", MediaType.APPLICATION_JSON_VALUE, body.toString().getBytes());
 
         mockMvc.perform(multipart("/ads")
-                                .file(image)
-                                .content(body.toString())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header(HttpHeaders.AUTHORIZATION, "Basic " + HttpHeaders.encodeBasicAuth("petrov@gmail.com", "87654321", StandardCharsets.UTF_8)))
+                        .file(json)
+                        .file(image)
+                        .header(HttpHeaders.AUTHORIZATION, "Basic " + HttpHeaders.encodeBasicAuth("petrov@gmail.com", "87654321", StandardCharsets.UTF_8)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.author").value(author.getId()))
                 .andExpect(jsonPath("$.image").value("/ads/imageAnnounce/" + imageExtend))
