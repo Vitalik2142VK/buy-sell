@@ -73,16 +73,6 @@ public class AnnounceServiceImpl implements AnnounceService {
 
     /**
      *
-     * the method returns announce by id
-     */
-    @Override
-    public AnnounceDtoIn get(Integer id) {
-        var announce = announceRepository.findById(id).orElseThrow(NotFoundAnnounceException::new);
-        return announceMapper.toDtoIn(announce, Optional.ofNullable(announce.getAuthor()).orElseThrow(NotFoundUserException::new));
-    }
-
-    /**
-     *
      * the method add announce
      */
     @Override
@@ -95,6 +85,16 @@ public class AnnounceServiceImpl implements AnnounceService {
         Announce announce = announceRepository.save(announceMapper.toAnnounce(properties, user, WorkWithImage.saveAndGetStringImage(imagePath, fileName, image)));
         LOGGER.debug("Add new " + announce.getAuthor() + ": " + announce.getTitle() + " " + announce.getDescription());
         return announceMapper.toDTO(announce);
+    }
+
+    /**
+     *
+     * the method returns announce by id
+     */
+    @Override
+    public AnnounceDtoIn get(Integer id) {
+        var announce = announceRepository.findById(id).orElseThrow(NotFoundAnnounceException::new);
+        return announceMapper.toDtoIn(announce, Optional.ofNullable(announce.getAuthor()).orElseThrow(NotFoundUserException::new));
     }
 
     /**

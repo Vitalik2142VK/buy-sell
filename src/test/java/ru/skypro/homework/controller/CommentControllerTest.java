@@ -31,6 +31,7 @@ import javax.validation.Valid;
 import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -186,29 +187,41 @@ class CommentControllerTest extends TestContainerPostgre {
 
     }
 
-    //    @Test
-//    @Transactional
-//    void updateCommentTest() throws Exception{
-//        insertUsers(userRepository, encoder);
-//        insertAnnounce(announceRepository, userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow());
-//        User author = userRepository.findFirstByEmail("ivanov@gmail.com").orElseThrow();
-//        Announce ad = announceRepository.save(createAnnounce(
-//                userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow(),
-//                "Описание объявления 3",
-//                "null",
-//                2000,
-//                "Заголовок объявления 3"));
-//
-//        String text = "Good product!";
-//        Comment comment = commentRepository.save(createComment(author, ad, text));
-//        String newComment = "Very good product";
-//
-//        mockMvc.perform(
-//                        patch("/ads/" + ad.getId() + "/comments/" + comment.getId())
-//                                .header(HttpHeaders.AUTHORIZATION,"Basic " + HttpHeaders.encodeBasicAuth("ivanov@gmail.com", "12345678", StandardCharsets.UTF_8))
-//                                .contentType(MediaType.APPLICATION_JSON)
-//                                .content(newComment))
-//                .andExpect(status().isOk());
-//
-//    }
+    @Test
+    @Transactional
+    void updateCommentTest() throws Exception{
+        insertUsers(userRepository, encoder);
+        insertAnnounce(announceRepository, userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow());
+        User author = userRepository.findFirstByEmail("ivanov@gmail.com").orElseThrow();
+        Announce ad = announceRepository.save(createAnnounce(
+                userRepository.findFirstByEmail("petrov@gmail.com").orElseThrow(),
+                "Описание объявления 3",
+                "null",
+                2000,
+                "Заголовок объявления 3"));
+
+        String text = "Good product!";
+        Comment comment = commentRepository.save(createComment(author, ad, text));
+        String newComment = "Very good product";
+
+        JSONObject body = new JSONObject();
+        body.put("text", newComment);
+
+        mockMvc.perform(
+                        patch("/ads/" + ad.getId() + "/comments/" + comment.getId())
+                                .header(HttpHeaders.AUTHORIZATION,"Basic " + HttpHeaders.encodeBasicAuth("ivanov@gmail.com", "12345678", StandardCharsets.UTF_8))
+                                .content(body.toString())
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.author").value(author.getId()))
+                .andExpect(jsonPath("$.authorImage").value(author.getImage()))
+                .andExpect(jsonPath("$.authorFirstName").value("Иван"))
+                .andExpect(jsonPath("$.createdAt").isNotEmpty())
+                .andExpect(jsonPath("$.pk").value(comment.getId()))
+                .andExpect(jsonPath("$.text").value("Very good product"));
+
+        Comment actual = commentRepository.findById(comment.getId()).orElseThrow();
+
+        assertEquals("Very good product", actual.getText());
+    }
 }

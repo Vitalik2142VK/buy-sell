@@ -177,7 +177,10 @@ public class UserControllerTest extends TestContainerPostgre{
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-         byte[] actual = userService.getImage(user.getImage());
+         byte[] actual = userService.getImage(
+                 userRepository.findFirstByEmail("petrov@gmail.com")
+                         .orElseThrow()
+                         .getImage());
 
          assertArrayEquals("1234".getBytes(), actual);
     }

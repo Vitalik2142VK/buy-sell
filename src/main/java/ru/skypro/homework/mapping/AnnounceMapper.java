@@ -34,16 +34,6 @@ public class AnnounceMapper {
         return announceDtoOut;
     }
 
-    public Announce toEntity(AnnounceDtoIn announceDtoIn) {
-        Announce announce = new Announce();
-        announce.setAuthor(userRepository.findFirstByEmail(announceDtoIn.getEmail()).orElseThrow(NotFoundUserException::new));
-        announce.setDescription(announceDtoIn.getDescription());
-        announce.setImage(announceDtoIn.getImage());
-        announce.setPrice(announceDtoIn.getPrice());
-        announce.setTitle(announceDtoIn.getTitle());
-        return announce;
-    }
-
     /**
      *
      * the method fills some of the fields of the AnnounceDtoIn object

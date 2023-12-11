@@ -8,17 +8,21 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.TestContainerPostgre;
 import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.component.UserAuthDetailsService;
 import ru.skypro.homework.dto.Role;
+import ru.skypro.homework.dto.announce.AnnounceDtoIn;
 import ru.skypro.homework.dto.announce.AnnounceDtoOut;
 import ru.skypro.homework.dto.announce.AnnouncesDtoOut;
 import ru.skypro.homework.dto.announce.CreateOrUpdateAd;
 import ru.skypro.homework.entity.Announce;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.NotFoundCommentException;
+import ru.skypro.homework.helper.WorkImagePathAndUrl;
 import ru.skypro.homework.mapping.AnnounceMapper;
 import ru.skypro.homework.repository.AnnounceRepository;
 import ru.skypro.homework.repository.CommentRepository;
@@ -26,13 +30,13 @@ import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.AnnounceService;
 
 
+import javax.servlet.http.Part;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -48,6 +52,8 @@ public class AnnounceControllerTest extends TestContainerPostgre {
     private CommentRepository commentRepository;
     @Autowired
     private AnnounceMapper announceMapper;
+    @Autowired
+    private WorkImagePathAndUrl workImagePathAndUrl;
     @Autowired
     private PasswordEncoder encoder;
     @Autowired
@@ -140,21 +146,22 @@ public class AnnounceControllerTest extends TestContainerPostgre {
         dto.setDescription("Описание объявления");
 
         JSONObject body = new JSONObject();
-        body.put("title", dto.getTitle());
-        body.put("price", dto.getPrice());
-        body.put("description", dto.getDescription());
+        body.put("title", "Заголовок объявления");
+        body.put("price", 1500);
+        body.put("description", "Описание объявления");
 
         int numberAds = announceRepository.getNumberUserAds(author.getId()) + 1;
         String imageExtend = "Ads_" + numberAds + "_auth_" + author.getId() + "_lg_" + author.getEmail().hashCode();
 
-        String stringJson = body.toString(); //"{\"title\":\"Заголовок объявления\",\"price\":1500,\"description\":\"Описание объявления\"}";
+        String stringJson = "{  \"title\": \"Заголовок объявления\",\"price\": 1500,\"description\": \"Описание объявления\"}";//body.toString(); //"{\"title\":\"Заголовок объявления\",\"price\":1500,\"description\":\"Описание объявления\"}";
 
         MockMultipartFile image = new MockMultipartFile("image", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "1234".getBytes());
-        MockMultipartFile json = new MockMultipartFile("json", "", MediaType.APPLICATION_JSON_VALUE, body.toString().getBytes());
+        MockMultipartFile json = new MockMultipartFile("json", "", MediaType.APPLICATION_JSON_VALUE, stringJson.getBytes());
 
-        mockMvc.perform(multipart("/ads")
+        mockMvc.perform(multipart(HttpMethod.POST, "/ads")
                         .file(json)
                         .file(image)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
                         .header(HttpHeaders.AUTHORIZATION, "Basic " + HttpHeaders.encodeBasicAuth("petrov@gmail.com", "87654321", StandardCharsets.UTF_8)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.author").value(author.getId()))
@@ -162,13 +169,48 @@ public class AnnounceControllerTest extends TestContainerPostgre {
                 .andExpect(jsonPath("$.pk").isNotEmpty())
                 .andExpect(jsonPath("$.price").value(1500))
                 .andExpect(jsonPath("$.title").value("Заголовок объявления"));
+
+    }
+
+    @Test
+    @Transactional
+    void getTest() throws Exception {
+        User author = userRepository.save(createUser(
+                "ivanov@gmail.com",
+                "12345678",
+                "Иван",
+                "Иванов",
+                "+78001111111",
+                null,
+                Role.USER,
+                encoder
+        ));
+        Announce ad = insertAnnounce(announceRepository, author);
+
+        AnnounceDtoIn dto = announceService.get(ad.getId());
+        String imageAds = "/ads/imageAnnounce/null";
+
+        mockMvc.perform(
+                        get("/ads/" + ad.getId())
+                                .header(HttpHeaders.AUTHORIZATION, "Basic " + HttpHeaders.encodeBasicAuth("ivanov@gmail.com", "12345678", StandardCharsets.UTF_8))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.pk").value(author.getId()))
+                .andExpect(jsonPath("$.authorFirstName").value("Иван"))
+                .andExpect(jsonPath("$.authorLastName").value("Иванов"))
+                .andExpect(jsonPath("$.description").value("Описание объявления"))
+                .andExpect(jsonPath("$.email").value("ivanov@gmail.com"))
+                .andExpect(jsonPath("$.image").value(imageAds))
+                .andExpect(jsonPath("$.phone").value("+78001111111"))
+                .andExpect(jsonPath("$.price").value(1000))
+                .andExpect(jsonPath("$.title").value("Заголовок объявления"));
     }
 
     @Test
     @Transactional
     void deleteAnnounceTest() throws Exception {
         insertUsers(userRepository, encoder);
-        User admin = userRepository.save(createUser(
+        userRepository.save(createUser(
                 "admin@gmail.com",
                 "0102030405",
                 "Админ",
@@ -228,5 +270,77 @@ public class AnnounceControllerTest extends TestContainerPostgre {
         assertEquals("Измененный заголовок", actual.getTitle());
         assertEquals(2000, actual.getPrice());
         assertEquals("Измененное описание", actual.getDescription());
+    }
+
+    @Test
+    @Transactional
+    public void updateImageTest() throws Exception {
+        User author = userRepository.save(createUser(
+                "petrov@gmail.com",
+                "87654321",
+                "Петр",
+                "Петров",
+                "+78002222222",
+                null,
+                Role.USER,
+                encoder));
+        Announce ad = announceRepository.save(createAnnounce(
+                author,
+                "Описание объявления",
+                "image.jpg",
+                1000,
+                "Заголовок объявления"
+        ));
+
+        MockMultipartFile image = new MockMultipartFile("image", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "1234".getBytes());
+
+        mockMvc.perform(multipart(HttpMethod.PATCH ,"/ads/" + ad.getId() + "/image")
+                        .file(image)
+                        .header(HttpHeaders.AUTHORIZATION, "Basic " + HttpHeaders.encodeBasicAuth("petrov@gmail.com", "87654321", StandardCharsets.UTF_8)))
+                .andExpect(status().isOk());
+
+        byte[] actual = announceService.getImage(
+                announceRepository.findById(ad.getId())
+                        .orElseThrow()
+                        .getImage());
+
+        assertArrayEquals("1234".getBytes(), actual);
+    }
+
+    @Test
+    @Transactional
+    public void getImageTest() throws Exception {
+        User author = userRepository.save(createUser(
+                "petrov@gmail.com",
+                "87654321",
+                "Петр",
+                "Петров",
+                "+78002222222",
+                null,
+                Role.USER,
+                encoder));
+        Announce ad = announceRepository.save(createAnnounce(
+                author,
+                "Описание объявления",
+                "image.jpg",
+                1000,
+                "Заголовок объявления"
+        ));
+
+        MultipartFile image = new MockMultipartFile("image", "image.jpg", MediaType.IMAGE_JPEG_VALUE, "image".getBytes());
+        announceService.updateImage(ad.getId() ,image);
+
+        mockMvc.perform(
+                        get(workImagePathAndUrl.getAdsImageUrl(ad.getImage()))
+                                .header(HttpHeaders.AUTHORIZATION,"Basic " + HttpHeaders.encodeBasicAuth("petrov@gmail.com", "87654321", StandardCharsets.UTF_8))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        byte[] actual = announceService.getImage(
+                announceRepository.findById(ad.getId())
+                        .orElseThrow()
+                        .getImage());
+
+        assertArrayEquals("image".getBytes(), actual);
     }
 }
