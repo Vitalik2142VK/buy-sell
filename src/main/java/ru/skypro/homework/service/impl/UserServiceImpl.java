@@ -96,6 +96,9 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Returns an array of image bytes
+     */
     @Override
     public byte[] getImage(String nameImage) throws IOException {
         return WorkWithImage.loadImage(getPathImage.getUserImagePath(nameImage));

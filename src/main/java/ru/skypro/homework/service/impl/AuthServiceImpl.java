@@ -29,12 +29,18 @@ public class AuthServiceImpl implements AuthService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Verifying user authentication
+     */
     @Override
     public boolean login(String userName, String password) {
         UserDetails userDetails = detailsService.loadUserByUsername(userName);
         return encoder.matches(password, userDetails.getPassword());
     }
 
+    /**
+     * Registering a new user
+     */
     @Override
     public boolean register(Register register) {
         if (userRepository.existsByEmail(register.getUsername())) {

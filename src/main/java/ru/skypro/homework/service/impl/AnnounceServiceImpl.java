@@ -53,8 +53,7 @@ public class AnnounceServiceImpl implements AnnounceService {
     }
 
     /**
-     *
-     * the method returns all announces
+     * The method returns all announces.
      */
     @Override
     public AnnouncesDtoOut getAll() {
@@ -62,8 +61,7 @@ public class AnnounceServiceImpl implements AnnounceService {
     }
 
     /**
-     *
-     * the method returns all user announces
+     * The method returns all user announces.
      */
     @Override
     public AnnouncesDtoOut getAllOfUser(UserAuth userDetails) {
@@ -72,8 +70,7 @@ public class AnnounceServiceImpl implements AnnounceService {
     }
 
     /**
-     *
-     * the method add announce
+     * The method add announce.
      */
     @Override
     public AnnounceDtoOut add(CreateOrUpdateAd properties,
@@ -88,8 +85,7 @@ public class AnnounceServiceImpl implements AnnounceService {
     }
 
     /**
-     *
-     * the method returns announce by id
+     * The method returns announce by id.
      */
     @Override
     public AnnounceDtoIn get(Integer id) {
@@ -98,8 +94,7 @@ public class AnnounceServiceImpl implements AnnounceService {
     }
 
     /**
-     *
-     * the method delete announce
+     * The method delete announce.
      */
     @Override
     @PreAuthorize("hasRole('ADMIN') or @announceServiceImpl.checkAuthor(principal, #announceId)")
@@ -115,8 +110,7 @@ public class AnnounceServiceImpl implements AnnounceService {
     }
 
     /**
-     *
-     * the method update announce info
+     * The method update announce info.
      */
     @Override
     @PreAuthorize("hasRole('ADMIN') or @announceServiceImpl.checkAuthor(principal, #announceId)")
@@ -126,8 +120,7 @@ public class AnnounceServiceImpl implements AnnounceService {
     }
 
     /**
-     *
-     * the method update announce image
+     * The method update announce image.
      */
     @Override
     @PreAuthorize("hasRole('ADMIN') or @announceServiceImpl.checkAuthor(principal, #announceId)")
@@ -139,14 +132,16 @@ public class AnnounceServiceImpl implements AnnounceService {
         return announce.getImage();
     }
 
+    /**
+     * Returns an array of image bytes
+     */
     @Override
     public byte[] getImage(String nameImage) throws IOException {
         return WorkWithImage.loadImage(getPathImage.getAdsImagePath(nameImage));
     }
 
     /**
-     *
-     * the method checks the user
+     * The method checks the user.
      */
     private boolean checkAuthor(Principal principal, int announceId) {
         int idUser = userRepository.getIdUserByEmail(principal.getName()).orElseThrow(NotFoundUserException::new);

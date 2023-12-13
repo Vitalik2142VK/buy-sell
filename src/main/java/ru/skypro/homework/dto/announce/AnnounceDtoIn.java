@@ -1,13 +1,12 @@
 package ru.skypro.homework.dto.announce;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@Getter
-@Setter
-@ToString
+@Data
 public class AnnounceDtoIn {
 
     @Schema(description = "id объявления")

@@ -37,7 +37,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentMapper commentMapper;
 
     /**
-     * The method searches for and returns a list of all comments to the ad by the ad id
+     * The method searches for and returns a list of all comments to the ad by the ad id.
      */
     @Override
     public CommentsDto findAllAdComments(Integer adId) {
@@ -48,7 +48,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * The method creates a comment to the ad by the ad id
+     * The method creates a comment to the ad by the ad id.
      */
     @Override
     public CommentDto createComment(Integer id, CreateOrUpdateCommentDto createOrUpdateComment,
@@ -62,7 +62,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * The method deletes the comment to the ad by the ad id and comment id
+     * The method deletes the comment to the ad by the ad id and comment id.
      */
     @Override
     @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.checkAuthor(principal, #commentId)")
@@ -76,7 +76,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * The method update the comment to the ad by the ad id and comment id
+     * The method update the comment to the ad by the ad id and comment id.
      */
     @Override
     @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.checkAuthor(principal, #commentId)")
@@ -90,7 +90,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * The method checks the author of the ad
+     * The method checks the author of the ad.
      */
     public boolean checkAuthor(Principal principal, int commentId) {
         int idUser = userRepository.getIdUserByEmail(principal.getName()).orElseThrow(NotFoundUserException::new);

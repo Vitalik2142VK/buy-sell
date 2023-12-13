@@ -7,6 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Saves, replaces, removes, and outputs an array of image bytes.
+ */
 public class WorkWithImage {
     private WorkWithImage() {}
 
@@ -41,7 +44,7 @@ public class WorkWithImage {
     }
 
     /**
-     * Load the image.
+     * Remove the image.
      */
     public static void removeImage(String imagePath) throws IOException {
         Path pathOld = Path.of(imagePath);

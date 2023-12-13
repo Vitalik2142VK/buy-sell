@@ -1,11 +1,14 @@
 package ru.skypro.homework.mapping;
 
 import org.springframework.stereotype.Component;
+import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.dto.comment.CommentDto;
 import ru.skypro.homework.dto.comment.CommentsDto;
 import ru.skypro.homework.dto.comment.CreateOrUpdateCommentDto;
 import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.helper.WorkImagePathAndUrl;
+import ru.skypro.homework.service.impl.CommentServiceImpl;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,7 +21,10 @@ public class CommentMapper {
     }
 
     /**
-     * A method that converts an object of the Comment class to an object of the CommentDto class.
+     * Converts {@link Comment} into {@link CommentDto}<br>
+     * It is used in methods:
+     * <br> - {@link CommentServiceImpl#createComment(Integer, CreateOrUpdateCommentDto, UserAuth)}
+     * <br> - {@link CommentServiceImpl#updateComment(Integer, Integer, CreateOrUpdateCommentDto)}
      */
     public CommentDto mapToCommentDto(Comment comment) {
         CommentDto commentDto = new CommentDto();
@@ -37,7 +43,9 @@ public class CommentMapper {
     }
 
     /**
-     * A method that converts an object of the CommentDto class to an object of the Comment class.
+     * Creates {@link Comment} from {@link CreateOrUpdateCommentDto}<br>
+     * It is used in methods:
+     * <br> - {@link CommentServiceImpl#createComment(Integer, CreateOrUpdateCommentDto, UserAuth)}
      */
     public Comment mapToNewComment(CreateOrUpdateCommentDto commentDto) {
         Comment comment = new Comment();
@@ -47,7 +55,9 @@ public class CommentMapper {
     }
 
     /**
-     * A method that converts a collection of the Comment class to a collection of the CommentsDto class.
+     * Converts {@link List<Comment>} into {@link CommentsDto}<br>
+     * It is used in methods:
+     * <br> - {@link CommentServiceImpl#findAllAdComments(Integer)}
      */
     public CommentsDto commentListToCommentDtoList(List<Comment> comments) {
         CommentsDto dto = new CommentsDto();

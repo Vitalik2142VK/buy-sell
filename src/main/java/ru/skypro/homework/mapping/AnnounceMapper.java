@@ -1,6 +1,8 @@
 package ru.skypro.homework.mapping;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.dto.announce.AnnouncesDtoOut;
 import ru.skypro.homework.dto.announce.CreateOrUpdateAd;
 import ru.skypro.homework.entity.Announce;
@@ -10,20 +12,25 @@ import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.NotFoundUserException;
 import ru.skypro.homework.helper.WorkImagePathAndUrl;
 import ru.skypro.homework.repository.UserRepository;
+import ru.skypro.homework.service.impl.AnnounceServiceImpl;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class AnnounceMapper {
-    private final UserRepository userRepository;
     private final WorkImagePathAndUrl urlImage;
 
-    public AnnounceMapper(UserRepository userRepository, WorkImagePathAndUrl urlImage) {
-        this.userRepository = userRepository;
+    public AnnounceMapper(WorkImagePathAndUrl urlImage) {
         this.urlImage = urlImage;
     }
 
+    /**
+     * Converts {@link Announce} into {@link AnnounceDtoOut}<br>
+     * It is used in methods:
+     * <br> - {@link AnnounceServiceImpl#add(CreateOrUpdateAd, MultipartFile, UserAuth)}
+     * <br> - {@link AnnounceServiceImpl#updateInfo(Integer, CreateOrUpdateAd)}
+     */
     public AnnounceDtoOut toDTO(Announce announce) {
         AnnounceDtoOut announceDtoOut = new AnnounceDtoOut();
         announceDtoOut.setAuthor(announce.getAuthor().getId());
@@ -35,8 +42,9 @@ public class AnnounceMapper {
     }
 
     /**
-     *
-     * the method fills some of the fields of the AnnounceDtoIn object
+     * Converts {@link Announce} into {@link AnnounceDtoIn}<br>
+     * It is used in methods:
+     * <br> - {@link AnnounceServiceImpl#get(Integer)}
      */
     public AnnounceDtoIn toDtoIn(Announce announce, User user) {
         AnnounceDtoIn announceDtoIn = new AnnounceDtoIn();
@@ -53,7 +61,9 @@ public class AnnounceMapper {
     }
 
     /**
-     * the method fills some of the fields of the AnnounceDtoIn object for update method
+     * Update {@link Announce} from {@link CreateOrUpdateAd}<br>
+     * It is used in methods:
+     * <br> - {@link AnnounceServiceImpl#updateInfo(Integer, CreateOrUpdateAd)}
      */
     public Announce toAnnounce(CreateOrUpdateAd properties, Announce announce) {
         announce.setDescription(properties.getDescription());
@@ -63,7 +73,9 @@ public class AnnounceMapper {
     }
 
     /**
-     * the method fills some of the fields of the AnnounceDtoIn object for add method
+     * Creates {@link Announce} from {@link CreateOrUpdateAd}<br>
+     * It is used in methods:
+     * <br> - {@link AnnounceServiceImpl#add(CreateOrUpdateAd, MultipartFile, UserAuth)}
      */
     public Announce toAnnounce(CreateOrUpdateAd properties, User user, String work) {
         Announce announce = new Announce();
@@ -76,7 +88,10 @@ public class AnnounceMapper {
     }
 
     /**
-     * A method that converts a collection of the Announce class to a collection of the AnnounceDtoOut class.
+     * Converts {@link List<Announce>} into {@link AnnouncesDtoOut}<br>
+     * It is used in methods:
+     * <br> - {@link AnnounceServiceImpl#getAll()}
+     * <br> - {@link AnnounceServiceImpl#getImage(String)}
      */
     public AnnouncesDtoOut announceListToAnnounceDtoOutList(List<Announce> announces) {
         var announcesDtoOut = new AnnouncesDtoOut();
