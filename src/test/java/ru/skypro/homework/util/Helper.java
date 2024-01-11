@@ -1,4 +1,4 @@
-package ru.skypro.homework.helper;
+package ru.skypro.homework.util;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.skypro.homework.dto.Role;

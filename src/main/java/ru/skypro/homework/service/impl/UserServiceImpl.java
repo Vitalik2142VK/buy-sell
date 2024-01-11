@@ -11,9 +11,9 @@ import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.dto.user.UserDto;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.NotFoundUserException;
-import ru.skypro.homework.helper.WorkImagePathAndUrl;
+import ru.skypro.homework.util.WorkImagePathAndUrl;
 import ru.skypro.homework.mapping.UserMapper;
-import ru.skypro.homework.helper.WorkWithImage;
+import ru.skypro.homework.util.WorkWithImage;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.UserService;
 

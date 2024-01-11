@@ -1,13 +1,11 @@
 package ru.skypro.homework.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +16,8 @@ import ru.skypro.homework.component.UserAuthDetailsService;
 import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.user.NewPasswordUser;
 import ru.skypro.homework.dto.user.UserChangeDto;
-import ru.skypro.homework.dto.user.UserDto;
 import ru.skypro.homework.entity.User;
-import ru.skypro.homework.helper.WorkImagePathAndUrl;
+import ru.skypro.homework.util.WorkImagePathAndUrl;
 import ru.skypro.homework.mapping.UserMapper;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.UserService;
@@ -31,8 +28,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.skypro.homework.helper.Helper.createUser;
-import static ru.skypro.homework.helper.Helper.insertUsers;
+import static ru.skypro.homework.util.Helper.createUser;
+import static ru.skypro.homework.util.Helper.insertUsers;
 
 public class UserControllerTest extends TestContainerPostgre{
     @Autowired

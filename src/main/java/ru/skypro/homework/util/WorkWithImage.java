@@ -1,4 +1,4 @@
-package ru.skypro.homework.helper;
+package ru.skypro.homework.util;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,7 +40,7 @@ public class WorkWithImage {
      * Load the image.
      */
     public static byte[] loadImage(String imagePath) throws IOException {
-        return  Files.readAllBytes(Paths.get(imagePath));
+        return Files.readAllBytes(Paths.get(imagePath));
     }
 
     /**

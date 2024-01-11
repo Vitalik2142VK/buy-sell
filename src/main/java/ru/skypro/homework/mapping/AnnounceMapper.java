@@ -9,9 +9,7 @@ import ru.skypro.homework.entity.Announce;
 import ru.skypro.homework.dto.announce.AnnounceDtoIn;
 import ru.skypro.homework.dto.announce.AnnounceDtoOut;
 import ru.skypro.homework.entity.User;
-import ru.skypro.homework.exception.NotFoundUserException;
-import ru.skypro.homework.helper.WorkImagePathAndUrl;
-import ru.skypro.homework.repository.UserRepository;
+import ru.skypro.homework.util.WorkImagePathAndUrl;
 import ru.skypro.homework.service.impl.AnnounceServiceImpl;
 
 import java.util.List;

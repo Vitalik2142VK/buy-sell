@@ -1,4 +1,4 @@
-package ru.skypro.homework.helper;
+package ru.skypro.homework.util;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

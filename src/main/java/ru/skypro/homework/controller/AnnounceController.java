@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,22 +13,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.component.UserAuth;
-import ru.skypro.homework.dto.announce.AnnounceDtoOut;
 import ru.skypro.homework.dto.announce.CreateOrUpdateAd;
 import ru.skypro.homework.entity.Announce;
-import ru.skypro.homework.exception.ForbiddenStatusException;
 import ru.skypro.homework.exception.NotFoundAnnounceException;
 import ru.skypro.homework.exception.NotFoundUserException;
 import ru.skypro.homework.exception.UserNotAuthorAnnounceException;
-import ru.skypro.homework.helper.WorkWithImage;
 import ru.skypro.homework.service.AnnounceService;
 
 import java.io.IOException;
-import java.util.List;
 
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
@@ -39,9 +33,6 @@ public class AnnounceController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AnnounceController.class);
 
     private final AnnounceService announceService;
-
-    @Value("${announce.image}")
-    private String path;
 
     public AnnounceController(AnnounceService announceService) {
         this.announceService = announceService;
@@ -71,7 +62,11 @@ public class AnnounceController {
     })
     @GetMapping("me")
     public ResponseEntity<?> getAllOfUser(@AuthenticationPrincipal UserAuth userDetails) {
-        return ResponseEntity.status(HttpStatus.OK).body(announceService.getAllOfUser(userDetails));
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(announceService.getAllOfUser(userDetails));
+        } catch (NotFoundUserException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @Operation(summary = "Добавление объявления")
@@ -177,7 +172,7 @@ public class AnnounceController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (NotFoundAnnounceException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (ForbiddenStatusException e) {
+        } catch (UserNotAuthorAnnounceException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }

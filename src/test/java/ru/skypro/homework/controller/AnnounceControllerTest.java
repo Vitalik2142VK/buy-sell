@@ -8,7 +8,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.TestContainerPostgre;
@@ -22,7 +21,7 @@ import ru.skypro.homework.dto.announce.CreateOrUpdateAd;
 import ru.skypro.homework.entity.Announce;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.NotFoundCommentException;
-import ru.skypro.homework.helper.WorkImagePathAndUrl;
+import ru.skypro.homework.util.WorkImagePathAndUrl;
 import ru.skypro.homework.mapping.AnnounceMapper;
 import ru.skypro.homework.repository.AnnounceRepository;
 import ru.skypro.homework.repository.CommentRepository;
@@ -30,7 +29,6 @@ import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.AnnounceService;
 
 
-import javax.servlet.http.Part;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -41,7 +39,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.skypro.homework.helper.Helper.*;
+import static ru.skypro.homework.util.Helper.*;
 
 public class AnnounceControllerTest extends TestContainerPostgre {
     @Autowired

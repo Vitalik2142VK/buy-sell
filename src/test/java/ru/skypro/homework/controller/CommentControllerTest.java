@@ -2,21 +2,16 @@ package ru.skypro.homework.controller;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.skypro.homework.TestContainerPostgre;
-import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.component.UserAuthDetailsService;
 import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.comment.CommentDto;
 import ru.skypro.homework.dto.comment.CommentsDto;
-import ru.skypro.homework.dto.comment.CreateOrUpdateCommentDto;
 import ru.skypro.homework.entity.Announce;
 import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.entity.User;
@@ -27,7 +22,6 @@ import ru.skypro.homework.repository.CommentRepository;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.CommentService;
 
-import javax.validation.Valid;
 import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -39,7 +33,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.skypro.homework.helper.Helper.*;
+import static ru.skypro.homework.util.Helper.*;
 
 class CommentControllerTest extends TestContainerPostgre {
 

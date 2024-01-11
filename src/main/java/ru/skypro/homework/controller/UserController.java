@@ -20,7 +20,6 @@ import ru.skypro.homework.dto.user.NewPasswordUser;
 import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.dto.user.UserDto;
 import ru.skypro.homework.exception.NotFoundUserException;
-import ru.skypro.homework.helper.WorkWithImage;
 import ru.skypro.homework.service.UserService;
 
 import java.io.IOException;
@@ -33,9 +32,6 @@ public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
-
-    @Value("${user.image}")
-    private String path;
 
     public UserController(UserService userService) {
         this.userService = userService;

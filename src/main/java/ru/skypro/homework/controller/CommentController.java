@@ -111,7 +111,7 @@ public class CommentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (UserNotAuthorCommentException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        } catch (NotFoundAnnounceException e) {
+        } catch (NotFoundAnnounceException | NotFoundCommentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }

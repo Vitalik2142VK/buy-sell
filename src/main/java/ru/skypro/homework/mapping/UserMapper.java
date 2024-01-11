@@ -5,7 +5,7 @@ import ru.skypro.homework.component.UserAuth;
 import ru.skypro.homework.dto.user.UserChangeDto;
 import ru.skypro.homework.dto.user.UserDto;
 import ru.skypro.homework.entity.User;
-import ru.skypro.homework.helper.WorkImagePathAndUrl;
+import ru.skypro.homework.util.WorkImagePathAndUrl;
 import ru.skypro.homework.service.impl.UserServiceImpl;
 
 @Component
@@ -36,6 +36,7 @@ public class UserMapper {
         }
         return dto;
     }
+
 
     /**
      * Updates {@link User} from {@link UserChangeDto}<br>

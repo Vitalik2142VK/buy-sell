@@ -18,5 +18,5 @@ public interface AnnounceService {
     AnnounceDtoOut updateInfo(Integer id, CreateOrUpdateAd property);
     String updateImage(Integer id, MultipartFile image) throws IOException;
     void delete(Integer id) throws IOException;
-    public byte[] getImage(String nameImage) throws IOException;
+    byte[] getImage(String nameImage) throws IOException;
 }

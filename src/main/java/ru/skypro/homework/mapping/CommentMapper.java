@@ -6,7 +6,7 @@ import ru.skypro.homework.dto.comment.CommentDto;
 import ru.skypro.homework.dto.comment.CommentsDto;
 import ru.skypro.homework.dto.comment.CreateOrUpdateCommentDto;
 import ru.skypro.homework.entity.Comment;
-import ru.skypro.homework.helper.WorkImagePathAndUrl;
+import ru.skypro.homework.util.WorkImagePathAndUrl;
 import ru.skypro.homework.service.impl.CommentServiceImpl;
 
 import java.util.List;
